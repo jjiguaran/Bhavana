@@ -1,0 +1,7 @@
+beautifulsoup4
+ollama
+requests
+numpy<2
+sentence-transformers
+jupyter
+ipykernel
