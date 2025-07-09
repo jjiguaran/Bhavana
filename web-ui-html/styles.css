@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+header {
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    font-weight: 300;
+}
+
+header p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.audio-player {
+    background: #f7fafc;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.audio-player h2 {
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.audio-controls {
+    margin-bottom: 1.5rem;
+}
+
+audio {
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+audio::-webkit-media-controls-panel {
+    background: #fff;
+    border-radius: 10px;
+}
+
+audio::-webkit-media-controls-play-button {
+    background: #667eea;
+    border-radius: 50%;
+}
+
+.player-info {
+    color: #718096;
+}
+
+.player-info p {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #a0aec0;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1rem;
+}
+
+footer {
+    color: #a0aec0;
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .audio-player {
+        padding: 1.5rem;
+    }
+    
+    .file-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}
+
+/* Hover effects */
+.audio-player:hover {
+    transform: translateY(-2px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+} 

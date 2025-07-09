@@ -5,3 +5,6 @@ numpy<2
 sentence-transformers
 jupyter
 ipykernel
+qdrant-client
+kokoro>=0.9.4
+soundfile
