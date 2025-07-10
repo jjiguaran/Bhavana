@@ -13,7 +13,7 @@ yarn-error.log*
 .env.production.local
 build/
 dist/
-web-ui/public/
+web-ui/public/*.wav
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
