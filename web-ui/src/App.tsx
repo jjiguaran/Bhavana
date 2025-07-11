@@ -7,59 +7,81 @@ interface AudioFile {
   displayName: string;
 }
 
-const audioFiles: AudioFile[] = [
-  { name: 'voz_kokoro.wav', path: '/voz_kokoro.wav', displayName: 'Voz Kokoro' },
-  { name: 'meditacion_kokoro.wav', path: '/meditacion_kokoro.wav', displayName: 'Meditación Kokoro' },
-  { name: 'meditacion_kokoro_2.wav', path: '/meditacion_kokoro_2.wav', displayName: 'Meditación Kokoro 2' }
-];
+const DURATIONS = [5, 10];
+const LEVELS = ["principiante", "avanzado"];
+const MUSIC_OPTIONS = ["con_musica", "_mute"];
 
 function App() {
-  const [selectedAudio, setSelectedAudio] = useState<AudioFile>(audioFiles[0]);
+  const [duracion, setDuracion] = useState<number | "">("");
+  const [nivel, setNivel] = useState<string>("");
+  const [musica, setMusica] = useState<string>("");
 
-  const handleAudioChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = audioFiles.find(file => file.name === event.target.value);
-    if (selected) {
-      setSelectedAudio(selected);
-    }
-  };
+  let audioFileName = "";
+  let audioFilePath = "";
+  if (duracion && nivel && musica) {
+    audioFileName = `meditacion_kokoro_${duracion}_${nivel}_${musica}.wav`;
+    audioFilePath = `/data/audio/${audioFileName}`;
+  }
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Contemplative AI - Audio Player</h1>
-        <p>Select and listen to meditation audio:</p>
+        <p>Filtra y escucha meditaciones:</p>
       </header>
       <main>
         <div className="audio-selector">
-          <label htmlFor="audio-select">Choose Audio File:</label>
-          <select 
-            id="audio-select" 
-            value={selectedAudio.name} 
-            onChange={handleAudioChange}
-            className="audio-dropdown"
-          >
-            {audioFiles.map((file) => (
-              <option key={file.name} value={file.name}>
-                {file.displayName}
-              </option>
-            ))}
-          </select>
+          <label>Duración:
+            <select
+              value={duracion}
+              onChange={e => setDuracion(Number(e.target.value))}
+              className="audio-dropdown"
+            >
+              <option value="">Selecciona duración</option>
+              {DURATIONS.map(d => (
+                <option key={d} value={d}>{d} minutos</option>
+              ))}
+            </select>
+          </label>
+          <label>Nivel:
+            <select
+              value={nivel}
+              onChange={e => setNivel(e.target.value)}
+              className="audio-dropdown"
+            >
+              <option value="">Selecciona nivel</option>
+              {LEVELS.map(l => (
+                <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>
+              ))}
+            </select>
+          </label>
+          <label>Música:
+            <select
+              value={musica}
+              onChange={e => setMusica(e.target.value)}
+              className="audio-dropdown"
+            >
+              <option value="">Selecciona música</option>
+              <option value="con_musica">Con música</option>
+              <option value="mute">Sin música</option>
+            </select>
+          </label>
         </div>
-        
-        <div className="audio-player">
-          <audio 
-            key={selectedAudio.name}
-            controls 
-            style={{ width: '100%', marginTop: '1rem' }}
-          >
-            <source src={process.env.PUBLIC_URL + selectedAudio.path} type="audio/wav" />
-            Your browser does not support the audio element.
-          </audio>
-          <div className="file-info">
-            <span>Currently playing: {selectedAudio.displayName}</span>
-            <span>File: {selectedAudio.name}</span>
+        {audioFileName && (
+          <div className="audio-player">
+            <audio
+              key={audioFileName}
+              controls
+              style={{ width: '100%', marginTop: '1rem' }}
+            >
+              <source src={process.env.PUBLIC_URL + audioFilePath} type="audio/wav" />
+              Tu navegador no soporta el elemento de audio.
+            </audio>
+            <div className="file-info">
+              <span>Archivo: {audioFileName}</span>
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );

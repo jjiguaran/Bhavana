@@ -6,6 +6,11 @@ This project has both Python (FastAPI backend) and React (frontend) components.
 
 ### Python Setup
 1. **Python 3.8+** should be installed on your system
+2. **ffmpeg** must be installed on your system. This is required for audio/video processing. For Ubuntu/Debian:
+   ```bash
+   sudo apt-get install ffmpeg
+   ```
+   For other systems, see: https://ffmpeg.org/download.html
 2. **Create virtual environment:**
    ```bash
    python -m venv venv
