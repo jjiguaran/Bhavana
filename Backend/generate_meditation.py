@@ -9,6 +9,14 @@ from qdrant_client import QdrantClient
 from io import BytesIO
 from pydub import AudioSegment
 import argparse
+import logging
+
+# Configure logging (do this once, at the top-level of your main file)
+logging.basicConfig(
+    level=logging.INFO,  # Or DEBUG for more verbosity
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 # Qdrant configuration
 QDRANT_HOST = "localhost"
@@ -23,7 +31,7 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 KOKORO_MODEL = "mistral"  # Change this to your specific model
 
 
-
+sample_rate = 24000
 ollama_client = Client(host=OLLAMA_BASE_URL)
 client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 embedding_model = SentenceTransformer(EMBEDDING_MODEL) 
@@ -78,77 +86,104 @@ def generate_text(minutes, nivel):
 
     ### Guía guiada (script temporal) en español:
     """
+    logger.info("Step 1: Generating text with Ollama")
     response = ollama_client.chat(
         model="mistral",  # or "llama3", etc.
         messages=[
             {"role": "user", "content": prompt}
         ]
     )
+    logger.info("Step 2: Text generated successfully")
     return(response['message']['content'])
 
 
-def generate_meditation(minutes, level, musica=False, path_binaural="../data/audio/simply-meditation-series-11hz-alpha-binaural-waves-for-relaxed-focus-8028.mp3"):
-    # Generar texto de meditación
-    meditation_text = generate_text(minutes, level)
-    pipeline = KPipeline(lang_code='e')
-
+def parsear_meditacion(texto):
     silencio_re = re.compile(r"\[silencio:\s*(\d+)\s*segundos?\]", re.IGNORECASE)
-
-    audio_total = []
-
-    for linea in meditation_text.strip().split('\n'):
+    segmentos = []
+    for linea in texto.strip().split('\n'):
         linea = linea.strip()
         if not linea:
             continue
-
-        match = silencio_re.match(linea)
-
+        match = silencio_re.search(linea)
         if match:
-            duracion_segundos = int(match.group(1))
-            duracion_muestras = duracion_segundos * 24000  # 24kHz samplerate
-            silencio = np.zeros(duracion_muestras, dtype=np.float32)
-            audio_total.append(silencio)
+            segundos = int(match.group(1))
+            texto_previo = silencio_re.sub('', linea).strip()
+            if texto_previo:
+                segmentos.append(("texto", texto_previo))
+            segmentos.append(("silencio", segundos))
         else:
-            generator = pipeline(linea, voice="em_alex", speed=0.75)
-            for _, _, audio in generator:
-                audio_total.append(audio)
+            segmentos.append(("texto", linea))
+    return segmentos
 
-    # Concatenar el audio generado
-    audio_final = np.concatenate(audio_total)
+def generar_audio_segmentos(segmentos, pipeline):
+    audio_texto = []
+    dur_texto_muestras = 0
+    dur_silencios_segundos = 0
+    for tipo, contenido in segmentos:
+        if tipo == 'texto':
+            logger.info(f"Generando audio para texto: {contenido}")
+            generator = pipeline(contenido, voice="em_alex", speed=0.75)
+            audio = np.concatenate([audio for _, _, audio in generator])
+            audio_texto.append(audio)
+            dur_texto_muestras += len(audio)
+        elif tipo == 'silencio':
+            dur_silencios_segundos += contenido
+    return audio_texto, dur_texto_muestras, dur_silencios_segundos
 
-    # Guardado provisional si no se requiere música
-    if not musica:
-        output_path = f"../data/audio/meditacion_kokoro_{minutes}_{level}_mute.wav"
-        sf.write(output_path, audio_final, samplerate=24000)
-        return output_path
+def ajustar_silencios_y_reconstruir(segmentos, audio_texto, dur_texto_muestras, dur_silencios_segundos, duracion_deseada_segundos):
+    audio_total = []
+    index_texto = 0
+    factor = 1.0
+    if dur_silencios_segundos > 0:
+        factor = max(0.0, (duracion_deseada_segundos - (dur_texto_muestras / sample_rate)) / dur_silencios_segundos)
+    logger.info(f"Factor de ajuste de silencios: {factor:.3f}")
 
-    # Si se requiere música, pasamos a AudioSegment para mezclar
-    # Convertir el array numpy a WAV temporal en memoria
-    
-    temp_buffer = BytesIO()
-    sf.write(temp_buffer, audio_final, samplerate=24000, format='WAV')
-    temp_buffer.seek(0)
-    meditacion = AudioSegment.from_file(temp_buffer, format="wav")
+    for tipo, contenido in segmentos:
+        if tipo == 'texto':
+            audio_total.append(audio_texto[index_texto])
+            index_texto += 1
+        elif tipo == 'silencio':
+            muestras = int(contenido * factor * sample_rate)
+            logger.info(f"Insertando silencio ajustado: {muestras/sample_rate:.2f} segundos")
+            audio_total.append(np.zeros(muestras, dtype=np.float32))
 
-    # Cargar binaural y adaptar duración
+    return np.concatenate(audio_total)
+
+def mezclar_con_musica(audio_np, path_binaural):
+    buffer = BytesIO()
+    sf.write(buffer, audio_np, samplerate=sample_rate, format='WAV')
+    buffer.seek(0)
+    meditacion = AudioSegment.from_file(buffer, format="wav")
+
     binaural = AudioSegment.from_file(path_binaural, format="mp3")
-    duracion_meditacion = len(meditacion)
-
-    if len(binaural) >= duracion_meditacion:
-        binaural = binaural[:duracion_meditacion]
+    if len(binaural) < len(meditacion):
+        binaural = (binaural * (len(meditacion) // len(binaural) + 1))[:len(meditacion)]
     else:
-        repeticiones = duracion_meditacion // len(binaural) + 1
-        binaural = (binaural * repeticiones)[:duracion_meditacion]
+        binaural = binaural[:len(meditacion)]
 
-    # Ajustar volumen del binaural y mezclar
-    binaural = binaural - 20
-    mezcla = meditacion.overlay(binaural)
+    binaural = binaural - 20  # reducir volumen
+    return meditacion.overlay(binaural)
 
-    # Guardar el archivo final
-    output_path = f"../data/audio/meditacion_kokoro_{minutes}_{level}_con_musica.wav"
-    mezcla.export(output_path, format="wav")
+def guardar_audio(audio_np, path):
+    sf.write(path, audio_np, samplerate=sample_rate)
 
-    return output_path
+def generate_meditation(minutes, level, musica=False, path_binaural="../data/audio/simply-meditation-series-11hz-alpha-binaural-waves-for-relaxed-focus-8028.mp3"):
+    texto = generate_text(minutes, level)
+    segmentos = parsear_meditacion(texto)
+    pipeline = KPipeline(lang_code='e')
+
+    audio_texto, dur_texto_muestras, dur_silencios_segundos = generar_audio_segmentos(segmentos, pipeline)
+    audio_final = ajustar_silencios_y_reconstruir(segmentos, audio_texto, dur_texto_muestras, dur_silencios_segundos, minutes * 60)
+
+    if not musica:
+        output = f"../data/audio/meditacion_kokoro_{minutes}_{level}_mute.wav"
+        guardar_audio(audio_final, output)
+        return output
+    else:
+        mezcla = mezclar_con_musica(audio_final, path_binaural)
+        output = f"../data/audio/meditacion_kokoro_{minutes}_{level}_con_musica.wav"
+        mezcla.export(output, format="wav")
+        return output
 
 
 if __name__ == "__main__":
