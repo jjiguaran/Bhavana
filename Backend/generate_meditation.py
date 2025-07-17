@@ -10,6 +10,8 @@ from io import BytesIO
 from pydub import AudioSegment
 import argparse
 import logging
+from meditation_cache import get_or_generate_text, ensure_collection
+
 
 # Configure logging (do this once, at the top-level of your main file)
 logging.basicConfig(
@@ -17,6 +19,8 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+ensure_collection()
 
 # Qdrant configuration
 QDRANT_HOST = "localhost"
@@ -36,65 +40,69 @@ ollama_client = Client(host=OLLAMA_BASE_URL)
 client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 embedding_model = SentenceTransformer(EMBEDDING_MODEL) 
 
-query= "give me a guided breath meditation step by step based on the anapanasati and the satipatana suttas that would lead me to insight"
-query_embedding = embedding_model.encode(query).tolist()
-results = client.search(
-    collection_name=COLLECTION_NAME,
-    query_vector=query_embedding,
-    limit=5,
-    with_payload=True   # top 5 most similar
-)
-context = "\n\n".join([r.payload.get("text", "") for r in results])
-
-
-
 def generate_text(minutes, nivel):
     duration = minutes * 60
-    prompt = f"""
-    Eres un guía de meditación con profundo conocimiento de las enseñanzas budistas.
 
-    Usa el siguiente contexto (en inglés) como inspiración para crear una meditación guiada, siguiendo la **progresión contemplativa** que se encuentra en el Anapanasati y el Satipatthana: comenzando con la respiración, luego el cuerpo, las sensaciones, la mente y finalmente los dhammas (fenómenos mentales como el deseo, el apego o la impermanencia).
+    query = f"guided meditation based on anapanasati and satipatthana, {minutes} minutes, level {nivel}"
+    query_embedding = embedding_model.encode(query).tolist()
 
-    La duración total de la meditación debe ser de aproximadamente **{duration} segundos**.
 
-    El nivel de experiencia del practicante es **{nivel}**.
+    def ollama_generate():
 
-    **Adapta tanto la forma como el contenido de la meditación a este nivel**, considerando lo siguiente:
+        results = client.search(
+            collection_name=COLLECTION_NAME,
+            query_vector=query_embedding,
+            limit=5,
+            with_payload=True
+        )
+        context = "\n\n".join([r.payload.get("text", "") for r in results])
+        prompt = f"""
+        Eres un guía de meditación con profundo conocimiento de las enseñanzas budistas.
 
-    - Si el nivel es *principiante*: utiliza frases claras, concretas y frecuentes. Los silencios deben ser más cortos (5–30 segundos). El enfoque debe estar en aspectos accesibles como la respiración, el cuerpo y las sensaciones simples.
+        Usa el siguiente contexto (en inglés) como inspiración para crear una meditación guiada, siguiendo la **progresión contemplativa** que se encuentra en el Anapanasati y el Satipatthana: comenzando con la respiración, luego el cuerpo, las sensaciones, la mente y finalmente los dhammas (fenómenos mentales como el deseo, el apego o la impermanencia).
 
-    - Si el nivel es *intermedio*: deja más espacio entre instrucciones, usa lenguaje contemplativo y accesible, con silencios medios (20–60 segundos). Explora también los estados mentales y el flujo cambiante de la experiencia.
+        La duración total de la meditación debe ser de aproximadamente **{duration} segundos**.
 
-    - Si el nivel es *avanzado*: guía mínima y profunda, con silencios largos (40–90 segundos). Lleva la atención hacia fenómenos más sutiles como la impermanencia, el desapego, la disolución del yo y otros dhammas. Permite que la sabiduría emerja desde la experiencia misma, sin interferencias.
+        El nivel de experiencia del practicante es **{nivel}**.
 
-    No expliques los textos ni hables del budismo explícitamente. No traduzcas literalmente el contexto ni lo menciones. No des instrucciones técnicas o abstractas. Evitá términos conceptuales o filosóficos. Guía solamente desde la experiencia directa.
+        **Adapta tanto la forma como el contenido de la meditación a este nivel**, considerando lo siguiente:
 
-    Permite que el contenido específico de cada nivel surja de forma natural a partir del contexto entregado. Inspírate en la estructura y profundidad progresiva que se presenta en los textos fuente, sin imponer una lista fija de temas.
+        - Si el nivel es *principiante*: utiliza frases claras, concretas y frecuentes. Los silencios deben ser más cortos (5–30 segundos). El enfoque debe estar en aspectos accesibles como la respiración, el cuerpo y las sensaciones simples.
 
-    Estructura la guía como un **script temporal**, con instrucciones breves seguidas de un silencio sugerido. Por ejemplo:
+        - Si el nivel es *intermedio*: deja más espacio entre instrucciones, usa lenguaje contemplativo y accesible, con silencios medios (20–60 segundos). Explora también los estados mentales y el flujo cambiante de la experiencia.
 
-    Pon atención a cómo entra y sale el aire  
-    [silencio: 10 segundos]
+        - Si el nivel es *avanzado*: guía mínima y profunda, con silencios largos (40–90 segundos). Lleva la atención hacia fenómenos más sutiles como la impermanencia, el desapego, la disolución del yo y otros dhammas. Permite que la sabiduría emerja desde la experiencia misma, sin interferencias.
 
-    Observa cómo se siente el cuerpo al respirar  
-    [silencio: 30 segundos]
+        No expliques los textos ni hables del budismo explícitamente. No traduzcas literalmente el contexto ni lo menciones. No des instrucciones técnicas o abstractas. Evitá términos conceptuales o filosóficos. Guía solamente desde la experiencia directa.
 
-    La meditación debe avanzar de forma **progresiva**, desde el enfoque en la respiración hacia observaciones más amplias de sensaciones, estados mentales y fenómenos. Usa frases simples, pausadas, y permite que el silencio acompañe cada paso.
+        Permite que el contenido específico de cada nivel surja de forma natural a partir del contexto entregado. Inspírate en la estructura y profundidad progresiva que se presenta en los textos fuente, sin imponer una lista fija de temas.
 
-    ### Contexto (en inglés):
-    {context}
+        Estructura la guía como un **script temporal**, con instrucciones breves seguidas de un silencio sugerido. Por ejemplo:
 
-    ### Guía guiada (script temporal) en español:
-    """
-    logger.info("Step 1: Generating text with Ollama")
-    response = ollama_client.chat(
-        model="mistral",  # or "llama3", etc.
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-    logger.info("Step 2: Text generated successfully")
-    return(response['message']['content'])
+        Pon atención a cómo entra y sale el aire  
+        [silencio: 10 segundos]
+
+        Observa cómo se siente el cuerpo al respirar  
+        [silencio: 30 segundos]
+
+        La meditación debe avanzar de forma **progresiva**, desde el enfoque en la respiración hacia observaciones más amplias de sensaciones, estados mentales y fenómenos. Usa frases simples, pausadas, y permite que el silencio acompañe cada paso.
+
+        ### Contexto (en inglés):
+        {context}
+
+        ### Guía guiada (script temporal) en español:
+        """
+        logger.info("Step 1: Generating text with Ollama")
+        response = ollama_client.chat(
+            model="mistral",  # or "llama3", etc.
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        logger.info("Step 2: Text generated successfully")
+        return(response['message']['content'])
+
+    return get_or_generate_text(query, nivel, duration, generate_fn=ollama_generate)
 
 
 def parsear_meditacion(texto):
