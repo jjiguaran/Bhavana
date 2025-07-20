@@ -11,3 +11,5 @@ soundfile
 pydub
 fastapi
 uvicorn
+tokenizers
+language_tool_python
