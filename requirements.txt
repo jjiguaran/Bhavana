@@ -13,3 +13,7 @@ fastapi
 uvicorn
 tokenizers
 language_tool_python
+pymupdf
+nltk
+tiktoken
+openai

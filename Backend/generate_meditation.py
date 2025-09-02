@@ -1,3 +1,4 @@
+from typing_extensions import Text
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from ollama import Client
@@ -33,7 +34,7 @@ OLLAMA_BASE_URL = "http://localhost:11434"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 # Kokoro configuration
-KOKORO_MODEL = "mistral"  # Change this to your specific model
+TEXT_MODEL = "llama3.1"  # Change this to your specific model
 
 
 sample_rate = 24000
@@ -86,7 +87,7 @@ def generate_text(minutes, nivel):
         """
         logger.info("Step 1: Generating text with Ollama")
         response = ollama_client.chat(
-            model="mistral",  # or "llama3", etc.
+            model=TEXT_MODEL,  # or "llama3", etc.
             messages=[
                 {"role": "user", "content": prompt}
             ]
