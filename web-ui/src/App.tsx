@@ -6,6 +6,8 @@ interface MeditationOption {
   level: string;
   music: boolean;
   display_name: string;
+  filename: string;
+  url: string; // Cloudflare R2 URL or local path
 }
 
 function App() {
@@ -13,18 +15,17 @@ function App() {
   const [nivel, setNivel] = useState<string>("");
   const [musica, setMusica] = useState<string>("");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [availableMeditations, setAvailableMeditations] = useState<MeditationOption[]>([]);
   const [loadingOptions, setLoadingOptions] = useState<boolean>(true);
 
-  // Fetch available meditation combinations on component mount
+  // Fetch available meditation combinations from static JSON
   useEffect(() => {
     const fetchAvailableMeditations = async () => {
       try {
-        const response = await fetch("http://localhost:8000/available-meditations");
+        const response = await fetch("/data/meditations.json");
         if (response.ok) {
           const data = await response.json();
-          setAvailableMeditations(data.data || []);
+          setAvailableMeditations(data || []);
         }
       } catch (err) {
         console.error("Error fetching available meditations:", err);
@@ -41,7 +42,25 @@ function App() {
   const getUniqueLevels = () => Array.from(new Set(availableMeditations.map(m => m.level))).sort();
   const getUniqueMusicOptions = () => Array.from(new Set(availableMeditations.map(m => m.music))).sort();
 
-  // Check if current combination is available
+  // Check if current combination is available and get direct URL
+  const getDirectAudioUrl = () => {
+    const meditation = availableMeditations.find(m => 
+      m.minutes === duracion && 
+      m.level === nivel && 
+      m.music === (musica === "con_musica")
+    );
+    
+    if (meditation && meditation.url) {
+      return meditation.url; // Use Cloudflare R2 URL
+    }
+    return null;
+  };
+
+  const getButtonText = () => {
+    if (loadingOptions) return "Cargando...";
+    return "Reproducir meditación";
+  };
+
   const isCombinationAvailable = () => {
     return availableMeditations.some(m => 
       m.minutes === duracion && 
@@ -50,39 +69,20 @@ function App() {
     );
   };
 
-  const handleGenerate = async () => {
+  const handlePlayMeditation = () => {
     if (!duracion || !nivel || !musica) return;
 
-    setLoading(true);
-    setAudioUrl(null);
+    console.log("Playing meditation with params:", { duracion, nivel, musica });
+    console.log("Available meditations:", availableMeditations);
 
-    try {
-      const response = await fetch("http://localhost:8000/get-meditation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          minutes: duracion,
-          nivel,
-          musica: musica === "con_musica",
-          path_binaural: "../data/audio/simply-meditation-series-11hz-alpha-binaural-waves-for-relaxed-focus-8028.mp3", // adjust if needed
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al generar el audio");
-      }
-
-      // Create object URL for audio blob
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      setAudioUrl(url);
-    } catch (err) {
-      console.error(err);
-      alert("Ocurrió un error generando la meditación.");
-    } finally {
-      setLoading(false);
+    // Get direct URL for existing file
+    const directUrl = getDirectAudioUrl();
+    console.log("Direct URL found:", directUrl);
+    
+    if (directUrl) {
+      setAudioUrl(directUrl);
+    } else {
+      alert("Esta meditación no está disponible.");
     }
   };
 
@@ -137,11 +137,11 @@ function App() {
             </select>
           </label>
           <button
-            onClick={handleGenerate}
-            disabled={!duracion || !nivel || !musica || loading || loadingOptions || !isCombinationAvailable()}
+            onClick={handlePlayMeditation}
+            disabled={!duracion || !nivel || !musica || loadingOptions || !isCombinationAvailable()}
             style={{ marginTop: '1rem' }}
           >
-            {loading ? "Generando..." : loadingOptions ? "Cargando..." : "Generar meditación"}
+            {getButtonText()}
           </button>
           {!loadingOptions && duracion && nivel && musica && !isCombinationAvailable() && (
             <p style={{ color: '#ff6b6b', fontSize: '0.9rem', marginTop: '0.5rem' }}>

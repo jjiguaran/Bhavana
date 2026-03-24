@@ -97,6 +97,7 @@ def get_available_combinations(audio_dir: str = "../data/audio") -> List[Dict[st
                 "minutes": meditation["minutes"],
                 "level": meditation["level"],
                 "music": meditation["music"],
+                "filename": meditation["filename"],
                 "display_name": f"{meditation['minutes']}min - {meditation['level'].title()} - {'Con Música' if meditation['music'] else 'Sin Música'}"
             })
     
