@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const DURATIONS = [5, 10];
-const LEVELS = ["principiante", "avanzado"];
-const MUSIC_OPTIONS = ["con_musica", "mute"];
+interface MeditationOption {
+  minutes: number;
+  level: string;
+  music: boolean;
+  display_name: string;
+}
 
 function App() {
   const [duracion, setDuracion] = useState<number | "">("");
@@ -11,6 +14,41 @@ function App() {
   const [musica, setMusica] = useState<string>("");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [availableMeditations, setAvailableMeditations] = useState<MeditationOption[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState<boolean>(true);
+
+  // Fetch available meditation combinations on component mount
+  useEffect(() => {
+    const fetchAvailableMeditations = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/available-meditations");
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableMeditations(data.data || []);
+        }
+      } catch (err) {
+        console.error("Error fetching available meditations:", err);
+      } finally {
+        setLoadingOptions(false);
+      }
+    };
+
+    fetchAvailableMeditations();
+  }, []);
+
+  // Get unique values for dropdowns
+  const getUniqueDurations = () => Array.from(new Set(availableMeditations.map(m => m.minutes))).sort((a, b) => a - b);
+  const getUniqueLevels = () => Array.from(new Set(availableMeditations.map(m => m.level))).sort();
+  const getUniqueMusicOptions = () => Array.from(new Set(availableMeditations.map(m => m.music))).sort();
+
+  // Check if current combination is available
+  const isCombinationAvailable = () => {
+    return availableMeditations.some(m => 
+      m.minutes === duracion && 
+      m.level === nivel && 
+      m.music === (musica === "con_musica")
+    );
+  };
 
   const handleGenerate = async () => {
     if (!duracion || !nivel || !musica) return;
@@ -19,7 +57,7 @@ function App() {
     setAudioUrl(null);
 
     try {
-      const response = await fetch("http://localhost:8000/generate", {
+      const response = await fetch("http://localhost:8000/get-meditation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,6 +91,10 @@ function App() {
       <header className="App-header">
         <h1>Contemplative AI - Audio Player</h1>
         <p>Filtra y genera meditaciones guiadas personalizadas:</p>
+        {loadingOptions && <p style={{ color: '#666', fontSize: '0.9rem' }}>Cargando opciones disponibles...</p>}
+        {!loadingOptions && availableMeditations.length === 0 && (
+          <p style={{ color: '#ff6b6b', fontSize: '0.9rem' }}>No hay meditaciones disponibles en este momento.</p>
+        )}
       </header>
       <main>
         <div className="audio-selector">
@@ -63,7 +105,7 @@ function App() {
               className="audio-dropdown"
             >
               <option value="">Selecciona duración</option>
-              {DURATIONS.map(d => (
+              {getUniqueDurations().map((d: number) => (
                 <option key={d} value={d}>{d} minutos</option>
               ))}
             </select>
@@ -75,7 +117,7 @@ function App() {
               className="audio-dropdown"
             >
               <option value="">Selecciona nivel</option>
-              {LEVELS.map(l => (
+              {getUniqueLevels().map((l: string) => (
                 <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>
               ))}
             </select>
@@ -87,17 +129,25 @@ function App() {
               className="audio-dropdown"
             >
               <option value="">Selecciona música</option>
-              <option value="con_musica">Con música</option>
-              <option value="mute">Sin música</option>
+              {getUniqueMusicOptions().map((music: boolean) => (
+                <option key={music.toString()} value={music ? "con_musica" : "mute"}>
+                  {music ? "Con música" : "Sin música"}
+                </option>
+              ))}
             </select>
           </label>
           <button
             onClick={handleGenerate}
-            disabled={!duracion || !nivel || !musica || loading}
+            disabled={!duracion || !nivel || !musica || loading || loadingOptions || !isCombinationAvailable()}
             style={{ marginTop: '1rem' }}
           >
-            {loading ? "Generando..." : "Generar meditación"}
+            {loading ? "Generando..." : loadingOptions ? "Cargando..." : "Generar meditación"}
           </button>
+          {!loadingOptions && duracion && nivel && musica && !isCombinationAvailable() && (
+            <p style={{ color: '#ff6b6b', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+              Esta combinación no está disponible. Por favor selecciona otra opción.
+            </p>
+          )}
         </div>
 
         {audioUrl && (
