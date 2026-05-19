@@ -2,6 +2,9 @@
 /data/
 venv/
 
+# Environment variables with secrets
+.env
+
 # Node.js / React
 node_modules/
 npm-debug.log*
