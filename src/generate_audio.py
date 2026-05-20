@@ -214,7 +214,7 @@ def build_script_filename(script_info):
 def build_meditation_key(script_filename):
     """Turn a script filename like '5_principiante_1.json' into the audio key."""
     basename = script_filename.replace('.json', '')
-    return f"meditations/{basename}_silence.opus"
+    return f"meditations/silence/{basename}.opus"
 
 def extract_target_duration_from_filename(json_file_key):
     """Extract intended meditation duration from JSON filename
@@ -339,11 +339,11 @@ def assemble_adjusted_audio(segments, sample_rate, target_duration=None, gong_au
     
     return np.concatenate(final_parts), sample_rate
 
-def save_audio_to_r2(r2_client, bucket_name, audio_data, sr, script_filename, suffix="silence"):
+def save_audio_to_r2(r2_client, bucket_name, audio_data, sr, script_filename):
     """Save audio to R2 in meditations/ directory"""
     try:
         # Save audio to temporary file first (export as Opus)
-        temp_file = f"/tmp/generated_audio_{suffix}.opus"
+        temp_file = f"/tmp/generated_audio.opus"
         audio_segment = AudioSegment(
             (audio_data * 32768).astype(np.int16).tobytes(),
             frame_rate=sr,
@@ -354,8 +354,8 @@ def save_audio_to_r2(r2_client, bucket_name, audio_data, sr, script_filename, su
         
         # Create audio file key using script filename
         basename = script_filename.replace('.json', '')
-        audio_filename = f"{basename}_{suffix}.opus"
-        audio_key = f"meditations/{audio_filename}"
+        audio_filename = f"{basename}.opus"
+        audio_key = f"meditations/silence/{audio_filename}"
         
         # Upload to R2
         r2_client.upload_file(temp_file, bucket_name, audio_key)
@@ -533,7 +533,7 @@ try:
                 # ── 7g. Save to R2 ─────────────────────────────────────
                 combined_key = save_audio_to_r2(
                     r2_client, credentials['bucket_name'],
-                    final_audio, final_sr, script_filename, "silence"
+                    final_audio, final_sr, script_filename
                 )
                 
                 if combined_key:
@@ -544,7 +544,8 @@ try:
                         "level": level,
                         "variation": variation,
                         "model": MODEL_ID,
-                        "date_generated": date.today().strftime("%Y-%m-%d")
+                        "date_generated": date.today().strftime("%Y-%m-%d"),
+                        "music": "silence"
                     }
                     meditations_log["meditations"].append(new_entry)
                     upload_json_to_r2(
