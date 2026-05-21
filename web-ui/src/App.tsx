@@ -507,7 +507,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/data/meditations_repo_log.json');
+        const res = await fetch('/meditations_repo_log.json');
         if (res.ok) setRepoLog(await res.json());
       } catch (e) {
         console.error(e);
