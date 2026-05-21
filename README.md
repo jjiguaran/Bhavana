@@ -1,38 +1,26 @@
-# Contemplative AI
-Buddhist's texts based AI solution for everyone
+# Bhavana
 
-## Quick Start
+A meditation app that generates meditation scripts and audio using AI. All generated files are stored in Cloudflare R2.
 
-This project includes both Python backend and React frontend components. See [SETUP.md](SETUP.md) for detailed installation instructions.
+## Project Structure
 
-### Prerequisites
-- Python 3.8+
-- Node.js and npm (for React frontend)
+### Meditation Script Generation
+- **`src/generate_scripts.py`** — Generates meditation scripts using an AI model. These scripts are the textual content of the meditations.
 
-### Audio Player
-- Simple HTML version: Open `web-ui/index.html` in your browser
-- React version: Coming soon (see SETUP.md for instructions)
+### Meditation Audio Generation
+- **`notebooks/generate_audio.ipynb`** — Jupyter notebook that generates the spoken meditation audio from the scripts using text-to-speech.
 
-### Qdrant
-- tu run qdrant, execute this command in terminal while placed in the pc root folder(this has to me moved to the project folder):
-
-docker run -p 6333:6333 -p 6334:6334   -v "$(pwd)/qdrant_storage:/qdrant/storage:z"   qdrant/qdrant
-
-### uvicorn
-
-- tu run uvicorn, execute this command in terminal while placed in the Backend folder:
-
-uvicorn api_generate_meditation:app --reload
-
-### ollama
-to run ollama, execute this command in terminal(not sure if this is needed):
-
-ollama run llama3.1
-
+### Audio Mixing (Background Sounds)
+- **`src/audio_mixing.py`** — Adds ambient background sounds (e.g., nature, rain, white noise) to the generated meditation audio, producing the final mixed meditation audio files.
 
 ### Frontend
-- tu run frontend, execute this command in terminal while placed in the web-ui folder:
+- **`web-ui/`** — A React-based static website that serves as the frontend of the meditation app. Users can browse and play the generated meditations.
 
-npm start
+### Storage
+- All generated files (meditation scripts, audio files, and mixed audio) are saved to **Cloudflare R2** object storage.
 
-After all those are running, you can access the application at http://localhost:3000
+## Tech Stack
+- **Backend:** Python (script generation, audio mixing)
+- **Frontend:** React (static site in `web-ui/`)
+- **Storage:** Cloudflare R2
+- **AI Models:** Ollama (for script generation), Text-to-Speech (for audio generation)

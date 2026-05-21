@@ -1,4 +1,4 @@
-# Contemplative AI - Setup Guide
+# Bhavana - Setup Guide
 
 This project has both Python (FastAPI backend) and React (frontend) components.
 

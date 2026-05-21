@@ -631,7 +631,7 @@ export default function App() {
         <div className="card">
           {/* Header */}
           <p className="tod">{getTimeOfDay()}</p>
-          <h1 className="brand-title">Contemplative AI</h1>
+          <h1 className="brand-title">Bhavana</h1>
           <p className="tagline">un momento solo para ti</p>
 
           {/* Loading */}
