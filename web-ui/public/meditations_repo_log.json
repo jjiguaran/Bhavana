@@ -179,23 +179,7 @@
     {
       "duration": "15 min",
       "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-05-20",
-      "music": "silence"
-    },
-    {
-      "duration": "15 min",
-      "level": "avanzado",
       "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-05-20",
-      "music": "silence"
-    },
-    {
-      "duration": "20 min",
-      "level": "principiante",
-      "variation": 1,
       "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
       "date_generated": "2026-05-20",
       "music": "silence"
@@ -236,14 +220,6 @@
       "duration": "20 min",
       "level": "avanzado",
       "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-05-20",
-      "music": "silence"
-    },
-    {
-      "duration": "20 min",
-      "level": "avanzado",
-      "variation": 3,
       "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
       "date_generated": "2026-05-20",
       "music": "silence"
