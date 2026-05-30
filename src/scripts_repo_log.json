@@ -191,94 +191,255 @@
     },
     {
       "duration": "20 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "30 min",
       "level": "intermedio",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "30 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "30 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "45 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "45 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "45 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "45 min",
+      "level": "avanzado",
       "variation": 3,
       "model": "openrouter/owl-alpha",
       "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "60 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "60 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-18"
+    },
+    {
+      "duration": "60 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-19"
+    },
+    {
+      "duration": "60 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-19"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "15 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "20 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
     },
     {
       "duration": "20 min",
       "level": "avanzado",
-      "variation": 1,
-      "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
       "variation": 2,
       "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
+      "date_generated": "2026-05-29"
     },
     {
       "duration": "30 min",
-      "level": "avanzado",
-      "variation": 2,
+      "level": "principiante",
+      "variation": 1,
       "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
+      "date_generated": "2026-05-29"
     },
     {
-      "duration": "45 min",
+      "duration": "30 min",
       "level": "principiante",
       "variation": 2,
       "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
+      "date_generated": "2026-05-29"
     },
     {
-      "duration": "45 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
+      "duration": "30 min",
+      "level": "principiante",
       "variation": 3,
       "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
+      "date_generated": "2026-05-29"
     },
     {
-      "duration": "60 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
-    },
-    {
-      "duration": "60 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-18"
-    },
-    {
-      "duration": "60 min",
+      "duration": "30 min",
       "level": "intermedio",
       "variation": 3,
       "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-19"
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "30 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "30 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "45 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "45 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "45 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "60 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
     },
     {
       "duration": "60 min",
       "level": "avanzado",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "60 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "45 min",
+      "level": "principiante",
       "variation": 1,
       "model": "openrouter/owl-alpha",
-      "date_generated": "2026-05-19"
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "60 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "60 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "20 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "45 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
+    },
+    {
+      "duration": "20 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "openrouter/owl-alpha",
+      "date_generated": "2026-05-29"
     }
   ]
 }
