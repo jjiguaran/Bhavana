@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { initPostHog, captureEvent } from './posthog';
 
 /* ─── Brand tokens ──────────────────────────────────────────────────── */
 const css = `
@@ -503,6 +504,9 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const tickRef = useRef<number | null>(null);
 
+  /* init PostHog */
+  useEffect(() => { initPostHog(); }, []);
+
   /* fetch log */
   useEffect(() => {
     (async () => {
@@ -576,6 +580,14 @@ export default function App() {
     setCurrentTime(0);
     setPlaying(false);
 
+    captureEvent('meditation_started', {
+      duration: entry.duration,
+      level: entry.level,
+      music: entry.music,
+      variation: entry.variation,
+      model: entry.model,
+    });
+
     // give React a tick to render the <audio> with new src
     setTimeout(() => {
       const a = audioRef.current;
@@ -596,6 +608,14 @@ export default function App() {
     if (playing) {
       a.pause();
       setPlaying(false);
+      captureEvent('meditation_paused', selectedEntry ? {
+        duration: selectedEntry.duration,
+        level: selectedEntry.level,
+        music: selectedEntry.music,
+        variation: selectedEntry.variation,
+        progress_seconds: currentTime,
+        progress_pct: progressPct,
+      } : undefined);
     } else {
       a.play().then(() => setPlaying(true)).catch(console.error);
     }
@@ -647,7 +667,13 @@ export default function App() {
                     <div
                       key={d}
                       className={`pill${duracion === d ? ' active' : ''}`}
-                      onClick={() => { setDuracion(d); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                      onClick={() => {
+                        setDuracion(d);
+                        setAudioUrl(null);
+                        setSelectedEntry(null);
+                        setPlaying(false);
+                        setCurrentTime(0);
+                      }}
                     >
                       {formatDuration(d)}
                     </div>
@@ -662,7 +688,13 @@ export default function App() {
                     <div
                       key={l}
                       className={`pill${nivel === l ? ' active' : ''}`}
-                      onClick={() => { setNivel(l); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                      onClick={() => {
+                        setNivel(l);
+                        setAudioUrl(null);
+                        setSelectedEntry(null);
+                        setPlaying(false);
+                        setCurrentTime(0);
+                      }}
                     >
                       {capitalize(l)}
                     </div>
@@ -677,7 +709,13 @@ export default function App() {
                     <div
                       key={m}
                       className={`pill${musica === m ? ' active' : ''}`}
-                      onClick={() => { setMusica(m); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                      onClick={() => {
+                        setMusica(m);
+                        setAudioUrl(null);
+                        setSelectedEntry(null);
+                        setPlaying(false);
+                        setCurrentTime(0);
+                      }}
                     >
                       {capitalize(m)}
                     </div>
@@ -763,6 +801,12 @@ export default function App() {
               aria-label="Descargar meditación"
               title="Descargar"
               style={{ pointerEvents: audioUrl ? 'auto' : 'none', opacity: audioUrl ? 1 : 0.2, textDecoration: 'none' }}
+              onClick={() => captureEvent('meditation_downloaded', selectedEntry ? {
+                duration: selectedEntry.duration,
+                level: selectedEntry.level,
+                music: selectedEntry.music,
+                variation: selectedEntry.variation,
+              } : undefined)}
             >
               <IconDownload />
             </a>
@@ -788,7 +832,16 @@ export default function App() {
           onLoadedMetadata={() => {
             if (audioRef.current) setDuration(audioRef.current.duration);
           }}
-          onEnded={() => { setPlaying(false); setCurrentTime(0); }}
+          onEnded={() => {
+            setPlaying(false);
+            setCurrentTime(0);
+            captureEvent('meditation_completed', selectedEntry ? {
+              duration: selectedEntry.duration,
+              level: selectedEntry.level,
+              music: selectedEntry.music,
+              variation: selectedEntry.variation,
+            } : undefined);
+          }}
         />
       )}
     </>
