@@ -17,11 +17,6 @@ from qwen_tts import Qwen3TTSModel
 from pydub import AudioSegment
 
 # ── Choose your model ──────────────────────────────────────────────────────
-# Options:
-#   "Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice"   ← preset voices + instruction control
-#   "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"   ← describe any voice freely
-#   "Qwen/Qwen3-TTS-12Hz-1.7B-Base"          ← voice cloning
-#   "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice"   ← lighter, faster
 MODEL_ID = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -30,7 +25,6 @@ model = Qwen3TTSModel.from_pretrained(
     MODEL_ID,
     device_map="cuda:0",
     dtype=torch.bfloat16,
-    # attn_implementation="flash_attention_2",  # uncomment if flash-attn is installed
 )
 print('✅ Model loaded')
 
@@ -94,7 +88,6 @@ def list_voice_files_in_r2(r2_client, bucket_name):
         voice_files = []
         for obj in response.get('Contents', []):
             key = obj['Key']
-            # Support common audio formats
             if key.endswith(('.wav', '.mp3', '.flac', '.m4a', '.ogg')) and key != 'voices/':
                 voice_files.append({
                     'key': key,
@@ -103,7 +96,6 @@ def list_voice_files_in_r2(r2_client, bucket_name):
                     'size': obj['Size']
                 })
         
-        # Sort by filename
         voice_files.sort(key=lambda x: x['filename'])
         return voice_files
         
@@ -123,28 +115,19 @@ def download_from_r2(r2_client, bucket_name, file_key, local_path="/tmp/"):
         print(f"  ❌ Error downloading file {file_key}: {e}")
         return None
 
-
 def download_gong_from_r2(r2_client, bucket_name, gong_filename="freesound_community-gong-79191.mp3", local_path="/tmp/"):
     """Download the gong sound from the sounds/ directory in R2"""
     gong_key = f"sounds/{gong_filename}"
     return download_from_r2(r2_client, bucket_name, gong_key, local_path)
 
-
 def load_audio_as_numpy(audio_path, target_sr=24000):
-    """Load an audio file (MP3, WAV, etc.) and convert to numpy array at target sample rate.
-    
-    Returns:
-        tuple: (numpy array of float32 samples, sample_rate)
-    """
+    """Load an audio file and convert to numpy array at target sample rate."""
     audio = AudioSegment.from_file(audio_path)
-    # Convert to target sample rate
     audio = audio.set_frame_rate(target_sr)
-    # Convert to numpy array (mono)
     if audio.channels > 1:
         audio = audio.set_channels(1)
     samples = np.array(audio.get_array_of_samples(), dtype=np.float32) / 32768.0
     return samples, target_sr
-
 
 def download_voice_from_r2(r2_client, bucket_name, voice_key, local_path="/tmp/"):
     """Download voice file from R2 to local storage"""
@@ -199,11 +182,7 @@ def upload_json_to_r2(r2_client, bucket_name, file_key, data):
         return False
 
 def build_script_filename(script_info):
-    """Build the filename for a script given its duration, level, and variation.
-    
-    E.g. duration='5 min', level='principiante', variation=1 → '5_principiante_1.json'
-    """
-    # Extract numeric minutes from strings like "5 min", "10 min", etc.
+    """Build the filename for a script given its duration, level, and variation."""
     duration_str = script_info.get('duration', '')
     match = re.match(r'(\d+)', duration_str)
     minutes = match.group(1) if match else '0'
@@ -217,23 +196,14 @@ def build_meditation_key(script_filename):
     return f"meditations/silence/{basename}.opus"
 
 def extract_target_duration_from_filename(json_file_key):
-    """Extract intended meditation duration from JSON filename
-    
-    Supported formats:
-    - meditation_5min_level_uuid.json
-    - 5_principiante_1.json          (leading number = minutes)
-    - 10min_meditation.json
-    Returns duration in seconds, or None if not found
-    """
+    """Extract intended meditation duration from JSON filename"""
     filename = json_file_key.split('/')[-1]
     
-    # Try explicit "XXmin" pattern (e.g. "5min", "10min")
     match = re.search(r'(\d+)\s*min', filename, re.IGNORECASE)
     if match:
         minutes = int(match.group(1))
-        return minutes * 60  # Convert to seconds
+        return minutes * 60
     
-    # Try leading number before underscore (e.g. "5_principiante_1" → 5 min)
     match = re.match(r'(\d+)_', filename)
     if match:
         minutes = int(match.group(1))
@@ -243,73 +213,84 @@ def extract_target_duration_from_filename(json_file_key):
 
 def parse_and_generate_audio(model, content, language, reference_audio_path, ref_text="", instruct=""):
     """Parse meditation content, generate TTS for speech lines ONCE, and track silence durations.
-    
-    Returns:
-        tuple: (final_audio, sample_rate, speech_duration, total_silence_duration)
+    Fades the voice signal down to match the exact level of the organic background hum,
+    preventing any "dead air" drops before structural silences.
     """
     lines = [line.strip() for line in content.strip().split('\n') if line.strip()]
     target_sr = 24000
-    
-    # Generate all audio segments: speech via TTS, silence as placeholder durations
-    segments = []  # list of (type, data) where type is 'speech' (audio array) or 'silence' (duration in seconds)
+    segments = []
     
     for line in lines:
         silence_match = re.match(r'\[silencio:\s*(\d+)\s*segundos?\]', line, re.IGNORECASE)
         if silence_match:
             segments.append(('silence', int(silence_match.group(1))))
         else:
-            # Generate TTS using voice cloning (happens only once)
+            # Ensure the line has a trailing cadence marker so the model winds down naturally
+            clean_line = line.strip()
+            if not clean_line.endswith(('.', ',', '?', '!', '...')):
+                clean_line += "..."
+
             wavs, sr = model.generate_voice_clone(
-                text=line,
+                text=clean_line,
                 language=language,
                 ref_audio=reference_audio_path,
                 ref_text=ref_text,
                 instruct=instruct,
             )
+            
+            speech_signal = wavs[0]
             if sr != target_sr:
                 from scipy import signal
-                resampled = signal.resample(wavs[0], int(len(wavs[0]) * target_sr / sr))
-                segments.append(('speech', resampled.astype(np.float32)))
-            else:
-                segments.append(('speech', wavs[0]))
+                speech_signal = signal.resample(speech_signal, int(len(speech_signal) * target_sr / sr))
+            
+            # ─── FIXED: FADE TO ORGANIC BACKGROUND HUM ───
+            # 1. Create a natural trailing cushion (0.5s)
+            buffer_duration = 0.50  
+            buffer_samples = int(buffer_duration * target_sr)
+            
+            # Generate the exact same organic comfort noise profile used in the rest of the app
+            HUM_LEVEL = 0.00005
+            comfort_tail = np.random.normal(0, HUM_LEVEL, buffer_samples).astype(np.float32)
+            
+            # Concatenate the voice with our trailing room cushion
+            extended_signal = np.concatenate([speech_signal, comfort_tail])
+            
+            # 2. Apply the 400ms exponential fade-out to the VOICE ONLY
+            fade_duration = 0.40  
+            fade_samples = int(fade_duration * target_sr)
+            
+            if len(extended_signal) > fade_samples:
+                # Creates an exponential decay window from 1.0 down to 0.0
+                fade_window = np.logspace(0, -3, num=fade_samples, base=10.0)
+                fade_window = (fade_window - fade_window[-1]) / (fade_window[0] - fade_window[-1])
+                
+                # Extract the audio chunk we want to fade
+                fade_chunk = extended_signal[-fade_samples:]
+                
+                # Generate a parallel layer of clean background hum for this chunk
+                constant_hum = np.random.normal(0, HUM_LEVEL, fade_samples).astype(np.float32)
+                
+                # Apply the fade to the audio chunk, but add back the un-faded constant hum.
+                # This ensures the voice signals disappear to 0, leaving ONLY the hum active.
+                extended_signal[-fade_samples:] = (fade_chunk * fade_window) + (constant_hum * (1.0 - fade_window))
+            # ─────────────────────────────────────────────
+
+            segments.append(('speech', extended_signal.astype(np.float32)))
     
-    # Calculate speech duration and total original silence
     speech_duration = sum(len(audio) for seg_type, audio in segments if seg_type == 'speech') / target_sr
     total_silence = sum(dur for seg_type, dur in segments if seg_type == 'silence')
     
     return segments, target_sr, speech_duration, total_silence
 
-
 def assemble_adjusted_audio(segments, sample_rate, target_duration=None, gong_audio=None):
-    """Assemble final audio from segments, adjusting silence durations to hit target.
-    
-    This does NOT regenerate TTS — it only scales silence segments.
-    If target_duration is None, original silence durations are kept.
-    If there's no speech content, falls back to silence-only audio.
-    
-    If gong_audio is provided, it is added at the beginning and end of the audio.
-    The gong duration is factored into the silence adjustment calculation so the
-    total audio (speech + 2×gong + adjusted silence) matches target_duration.
-    
-    Args:
-        segments: list of ('speech', audio_array) or ('silence', duration_seconds)
-        sample_rate: target sample rate
-        target_duration: desired total duration in seconds, or None for original timing
-        gong_audio: numpy array of gong audio samples, or None to skip
-    
-    Returns:
-        numpy array of audio samples
-    """
+    """Assemble final audio, converting digital zero silence blocks to microscopic room tone."""
     speech_duration = sum(len(audio) for seg_type, audio in segments if seg_type == 'speech') / sample_rate
     total_original_silence = sum(dur for seg_type, dur in segments if seg_type == 'silence')
     
-    # Account for gong duration (2x since it plays at beginning and end)
     gong_duration = (len(gong_audio) / sample_rate) if gong_audio is not None else 0.0
     total_gong_duration = 2 * gong_duration
     
-    # Determine silence factor
     if target_duration is not None:
-        # Fixed content includes speech + gong at both ends
         fixed_duration = speech_duration + total_gong_duration
         needed_total_silence = max(0, target_duration - fixed_duration)
         if total_original_silence > 0 and needed_total_silence >= 0:
@@ -321,19 +302,21 @@ def assemble_adjusted_audio(segments, sample_rate, target_duration=None, gong_au
     
     final_parts = []
     
-    # Add gong at the beginning
     if gong_audio is not None:
         final_parts.append(gong_audio)
     
     for seg_type, data in segments:
         if seg_type == 'speech':
             final_parts.append(data)
-        else:  # silence
+        else:
             original_dur = data
             adjusted_dur = int(original_dur * silence_factor * sample_rate)
-            final_parts.append(np.zeros(adjusted_dur, dtype=np.float32))
+            
+            # Fix 3: Fill silences with microscopic Gaussian comfort noise instead of absolute zeros
+            # This subtle noise floor prevents users' headphones from sounding "dead" or dropping out.
+            comfort_noise = np.random.normal(0, 0.00005, adjusted_dur).astype(np.float32)
+            final_parts.append(comfort_noise)
     
-    # Add gong at the end
     if gong_audio is not None:
         final_parts.append(gong_audio)
     
@@ -342,7 +325,6 @@ def assemble_adjusted_audio(segments, sample_rate, target_duration=None, gong_au
 def save_audio_to_r2(r2_client, bucket_name, audio_data, sr, script_filename):
     """Save audio to R2 in meditations/ directory"""
     try:
-        # Save audio to temporary file first (export as Opus)
         temp_file = f"/tmp/generated_audio.opus"
         audio_segment = AudioSegment(
             (audio_data * 32768).astype(np.int16).tobytes(),
@@ -352,12 +334,10 @@ def save_audio_to_r2(r2_client, bucket_name, audio_data, sr, script_filename):
         )
         audio_segment.export(temp_file, format="opus")
         
-        # Create audio file key using script filename
         basename = script_filename.replace('.json', '')
         audio_filename = f"{basename}.opus"
         audio_key = f"meditations/silence/{audio_filename}"
         
-        # Upload to R2
         r2_client.upload_file(temp_file, bucket_name, audio_key)
         print(f"  ✅ Audio saved to R2: {audio_key}")
         return audio_key
@@ -368,7 +348,6 @@ def save_audio_to_r2(r2_client, bucket_name, audio_data, sr, script_filename):
 
 # ── Main workflow: batch-generate missing meditations ──────────────────────
 try:
-    # ── 1. Connect ────────────────────────────────────────────────────────
     credentials = get_r2_credentials()
     r2_client = connect_to_r2(credentials)
     
@@ -376,7 +355,6 @@ try:
     r2_client.head_bucket(Bucket=credentials['bucket_name'])
     print("✅ R2 connection successful")
     
-    # ── 2. Load the repo logs ─────────────────────────────────────────────
     print("\n📋 Reading scripts repo log...")
     scripts_log = read_json_or_default(
         r2_client, credentials['bucket_name'],
@@ -395,8 +373,6 @@ try:
     existing_meditations = meditations_log.get("meditations", [])
     print(f"   Found {len(existing_meditations)} meditation(s) already generated.")
     
-    # ── 3. Compute missing scripts ────────────────────────────────────────
-    # Build a set of (duration, level, variation) tuples that already exist
     existing_set = set()
     for m in existing_meditations:
         existing_set.add((
@@ -418,12 +394,10 @@ try:
         for s in missing:
             print(f"   - {s.get('duration')} | {s.get('level')} | variation {s.get('variation')} | model: {s.get('model')}")
     
-    # ── 4. Download the voice file (use the first available) ──────────────
     print("\n🎙️ Searching for voice files in voices directory...")
     voice_files = list_voice_files_in_r2(r2_client, credentials['bucket_name'])
     voice_file_key = select_voice_file(voice_files)
     
-    # ── 5. Download the gong sound ────────────────────────────────────────
     print("\n🔔 Downloading gong sound from 'sounds/' directory...")
     gong_path = download_gong_from_r2(r2_client, credentials['bucket_name'])
     gong_audio = None
@@ -434,7 +408,6 @@ try:
     else:
         print("   ⚠️ No gong sound found — proceeding without it")
     
-    # ── 6. Download reference voice ──────────────────────────────────────
     if not voice_file_key:
         print("❌ No voice file available. Aborting.")
     else:
@@ -443,10 +416,8 @@ try:
         if not reference_audio_path:
             print("❌ Failed to download voice file. Aborting.")
         else:
-            # ref_text: transcription of the reference audio for better voice cloning accuracy
             ref_text = "Encontré una psicóloga a cinco minutos de tu casa. Si quieres, te puedo dar su número de teléfono."
             
-            # ── 7. Process each missing script ────────────────────────────
             for script_info in missing:
                 duration_str = script_info.get('duration', '')
                 level = script_info.get('level', 'unknown')
@@ -459,16 +430,12 @@ try:
                 
                 print(f"\n{'='*60}")
                 print(f"🎯 Generating: {duration_str} | {level} | variation {variation}")
-                print(f"   Script: {script_key}")
-                print(f"   Target: {meditation_key}")
                 
-                # ── 7a. Read the script JSON ──────────────────────────
                 json_data = read_json_from_r2(r2_client, credentials['bucket_name'], script_key)
                 if not json_data:
                     print(f"   ⚠️ Could not read script, skipping.")
                     continue
                 
-                # ── 7b. Extract text content ──────────────────────────
                 text_content = (json_data.get('meditation_content') or 
                               json_data.get('text') or 
                               json_data.get('content') or 
@@ -479,30 +446,25 @@ try:
                 
                 print(f"   📝 Content: {len(text_content)} chars")
                 
-                # ── Sanity check: skip if content is too long ─────────
                 if len(text_content) > 10000:
-                    print(f"   ⚠️ Content exceeds 10,000 chars ({len(text_content)}). Skipping to avoid TTS issues.")
+                    print(f"   ⚠️ Content exceeds 10,000 chars. Skipping.")
                     continue
                 
-                # ── 7c. Extract target duration ───────────────────────
                 target_duration = extract_target_duration_from_filename(script_key)
                 if target_duration:
                     print(f"   ⏱️ Target: {target_duration // 60} min {target_duration % 60} sec")
                 
-                # ── 7d. Generate TTS audio ────────────────────────────
                 print("   🎵 Generating TTS...")
                 segments, final_sr, speech_duration, total_silence = parse_and_generate_audio(
                     model, text_content, LANGUAGE, reference_audio_path, ref_text, VOICE_DESC
                 )
                 
-                # ── 7e. Assemble initial audio (with gong) ────────────
                 gong_total = (2 * len(gong_audio) / final_sr) if gong_audio is not None else 0.0
                 
                 initial_audio, _ = assemble_adjusted_audio(segments, final_sr, target_duration=None, gong_audio=gong_audio)
                 initial_duration = len(initial_audio) / final_sr
                 print(f"   📊 Raw: {speech_duration:.1f}s speech + {gong_total:.1f}s gong + {total_silence:.1f}s silence = {initial_duration:.1f}s total")
                 
-                # ── 7f. Adjust to target duration ─────────────────────
                 if target_duration:
                     if abs(initial_duration - target_duration) > 1.5:
                         if total_silence > 0:
@@ -516,10 +478,12 @@ try:
                         else:
                             padding_duration = target_duration - initial_duration
                             padding_samples = int(padding_duration * final_sr)
-                            padding = np.zeros(padding_samples, dtype=np.float32)
+                            
+                            # Pad missing time with the same soft comfort noise floor
+                            padding = np.random.normal(0, 0.00005, padding_samples).astype(np.float32)
                             final_audio = np.concatenate([initial_audio, padding])
                             duration = len(final_audio) / final_sr
-                            print(f"   🔧 Padding with {padding_duration:.1f}s at end")
+                            print(f"   🔧 Padding with {padding_duration:.1f}s comfort noise at end")
                     else:
                         print(f"   ✅ Duration already matches target")
                         final_audio = initial_audio
@@ -530,14 +494,12 @@ try:
                 
                 print(f"   ✅ Final: {duration:.1f}s")
                 
-                # ── 7g. Save to R2 ─────────────────────────────────────
                 combined_key = save_audio_to_r2(
                     r2_client, credentials['bucket_name'],
                     final_audio, final_sr, script_filename
                 )
                 
                 if combined_key:
-                    # ── 7h. Update meditations log ─────────────────────
                     from datetime import date
                     new_entry = {
                         "duration": duration_str,
