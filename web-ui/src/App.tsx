@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { initPostHog, captureEvent } from './posthog';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.REACT_APP_SUPABASE_URL!,
+  process.env.REACT_APP_SUPABASE_ANON_KEY!
+);
 
 /* ─── Brand tokens ──────────────────────────────────────────────────── */
 const css = `
@@ -52,7 +58,7 @@ const css = `
     z-index: 1;
   }
 
-  /* ── Ambient orbs — scale up on desktop so they fill the viewport ── */
+  /* ── Ambient orbs ── */
   .orb {
     position: fixed;
     border-radius: 50%;
@@ -83,6 +89,15 @@ const css = `
     border: 0.5px solid var(--border);
     border-radius: 24px;
     padding: 2.5rem 2rem 2rem;
+  }
+
+  /* ── Crossfade wrapper ── */
+  .fade-wrap {
+    transition: opacity 0.9s var(--ease-breath);
+  }
+  .fade-wrap.hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* ── Header ── */
@@ -257,7 +272,6 @@ const css = `
 
   .ring:hover .ring-icon { color: rgba(220,215,255,1); }
 
-  /* SVG play/pause icons */
   .ring-icon svg { width: 22px; height: 22px; }
 
   .session-label {
@@ -385,16 +399,302 @@ const css = `
 
   .var-hint button:hover { color: rgba(168,159,232,0.85); }
 
-  /* ── Hidden audio element ── */
   audio { display: none; }
 
-  /* ── Error state ── */
   .error-msg {
     text-align: center;
     font-size: 12px;
     color: rgba(232,184,122,0.7);
     margin-top: 0.5rem;
     letter-spacing: 0.03em;
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     FEEDBACK SCREEN
+  ════════════════════════════════════════════════════════════════════ */
+
+  /* Outer container that sits on top of the player via absolute positioning */
+  .feedback-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem 3rem;
+    z-index: 2;
+    transition: opacity 1.1s var(--ease-breath);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .feedback-wrap.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .feedback-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    background: rgba(28, 24, 48, 0.72);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 0.5px solid var(--border);
+    border-radius: 24px;
+    padding: 2.8rem 2rem 2.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Soft checkmark glyph shown after session ends */
+  .session-end-glyph {
+    font-size: 28px;
+    margin-bottom: 1.2rem;
+    opacity: 0.7;
+    animation: glyph-in 1.2s var(--ease-breath) forwards;
+  }
+
+  @keyframes glyph-in {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 0.7; transform: scale(1); }
+  }
+
+  .feedback-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 300;
+    color: rgba(235, 232, 255, 0.9);
+    text-align: center;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.35rem;
+  }
+
+  .feedback-subtitle {
+    font-size: 12px;
+    letter-spacing: 0.07em;
+    color: var(--ghost);
+    text-align: center;
+    margin-bottom: 2.2rem;
+  }
+
+  /* ── Mood options ── */
+  .mood-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 1.8rem;
+  }
+
+  .mood-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 10px 14px;
+    border-radius: 18px;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: all 0.22s var(--ease-breath);
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mood-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+
+  /* Per-mood accent colours on hover/active */
+  .mood-btn[data-mood="flowing"]::before  { background: radial-gradient(ellipse at 50% 120%, rgba(77,184,150,0.18), transparent 70%); }
+  .mood-btn[data-mood="clear"]::before    { background: radial-gradient(ellipse at 50% 120%, rgba(232,184,122,0.18), transparent 70%); }
+  .mood-btn[data-mood="drifting"]::before { background: radial-gradient(ellipse at 50% 120%, rgba(168,159,232,0.15), transparent 70%); }
+  .mood-btn[data-mood="restless"]::before { background: radial-gradient(ellipse at 50% 120%, rgba(220,100,80,0.16), transparent 70%); }
+
+  .mood-btn:hover::before, .mood-btn.selected::before { opacity: 1; }
+
+  .mood-btn:hover {
+    border-color: rgba(160,148,240,0.25);
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-1px);
+  }
+
+  .mood-btn.selected {
+    border-color: rgba(160,148,240,0.5);
+    background: rgba(123,111,208,0.12);
+    transform: translateY(-1px);
+  }
+
+  .mood-emoji {
+    font-size: 26px;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mood-label {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: rgba(192,189,232,0.55);
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+    transition: color 0.2s;
+  }
+
+  .mood-btn:hover .mood-label,
+  .mood-btn.selected .mood-label {
+    color: rgba(200,190,255,0.9);
+  }
+
+  /* ── Text expansion ── */
+  .nota-reveal {
+    width: 100%;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.55s var(--ease-breath), opacity 0.5s ease;
+  }
+
+  .nota-reveal.open {
+    max-height: 220px;
+    opacity: 1;
+  }
+
+  .nota-trigger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    color: rgba(160,148,240,0.5);
+    font-family: var(--font-ui);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    padding: 0;
+    margin-bottom: 1.4rem;
+    display: block;
+    width: 100%;
+    text-align: center;
+    transition: color 0.18s;
+  }
+
+  .nota-trigger:hover { color: rgba(168,159,232,0.85); }
+
+  .nota-box {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(160,148,240,0.2);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-family: var(--font-ui);
+    font-weight: 300;
+    color: rgba(192,189,232,0.85);
+    resize: none;
+    outline: none;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+    min-height: 90px;
+    margin-bottom: 10px;
+  }
+
+  .nota-box::placeholder { color: rgba(192,189,232,0.22); }
+  .nota-box:focus { border-color: rgba(160,148,240,0.45); }
+
+  /* ── Submit button ── */
+  .feedback-submit {
+    width: 100%;
+    padding: 12px 0;
+    border-radius: 30px;
+    border: 0.5px solid rgba(123,111,208,0.45);
+    background: rgba(123,111,208,0.14);
+    color: rgba(200,190,255,0.9);
+    font-size: 12px;
+    font-family: var(--font-ui);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+  }
+
+  .feedback-submit:hover {
+    background: rgba(123,111,208,0.26);
+    border-color: rgba(123,111,208,0.7);
+  }
+
+  /* ── Skip link ── */
+  .feedback-skip {
+    margin-top: 1.4rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: rgba(192,189,232,0.2);
+    font-family: var(--font-ui);
+    transition: color 0.18s;
+  }
+
+  .feedback-skip:hover { color: rgba(192,189,232,0.5); }
+
+  /* ── Thank-you state ── */
+  .thankyou-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    animation: glyph-in 0.8s var(--ease-breath) forwards;
+  }
+
+  .thankyou-glyph { font-size: 32px; opacity: 0.75; }
+
+  .thankyou-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 300;
+    color: rgba(235,232,255,0.88);
+    text-align: center;
+    letter-spacing: 0.02em;
+    margin-top: 0.4rem;
+  }
+
+  .thankyou-sub {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--ghost);
+    text-align: center;
+    margin-bottom: 1.8rem;
+  }
+
+  .new-session-btn {
+    padding: 11px 32px;
+    border-radius: 30px;
+    border: 0.5px solid rgba(123,111,208,0.4);
+    background: rgba(123,111,208,0.12);
+    color: rgba(200,190,255,0.85);
+    font-size: 12px;
+    font-family: var(--font-ui);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+  }
+
+  .new-session-btn:hover {
+    background: rgba(123,111,208,0.24);
+    border-color: rgba(123,111,208,0.65);
   }
 `;
 
@@ -412,8 +712,19 @@ interface MeditationLog {
   meditations: MeditationLogEntry[];
 }
 
+type AppScreen = 'player' | 'feedback' | 'thankyou';
+
 /* ─── Constants ─────────────────────────────────────────────────────── */
 const R2_BUCKET_URL = "https://pub-e5092eb6363d42ce8ac557dbecc589f0.r2.dev";
+
+const MOOD_OPTIONS = [
+  { id: 'flowing',  emoji: '🌊', label: 'En flujo' },
+  { id: 'clear',    emoji: '☀️', label: 'Despejado' },
+  { id: 'drifting', emoji: '🌫️', label: 'A la deriva' },
+  { id: 'restless', emoji: '🔥', label: 'Inquieto' },
+] as const;
+
+type MoodId = typeof MOOD_OPTIONS[number]['id'];
 
 /* ─── Helpers ───────────────────────────────────────────────────────── */
 function parseDurationMinutes(duration: string): number {
@@ -486,6 +797,141 @@ const IconVolume = () => (
   </svg>
 );
 
+/* ─── Feedback Screen ───────────────────────────────────────────────── */
+interface FeedbackScreenProps {
+  visible: boolean;
+  completedEntry: MeditationLogEntry | null;
+  onDone: () => void;         // go to thank-you
+  onNewSession: () => void;   // skip → back to player
+}
+
+function FeedbackScreen({ visible, completedEntry, onDone, onNewSession }: FeedbackScreenProps) {
+  const [selectedMood, setSelectedMood] = useState<MoodId | null>(null);
+  const [nota, setNota] = useState('');
+  const [saving, setSaving] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleMoodSelect = (mood: MoodId) => {
+    setSelectedMood(mood);
+    captureEvent('session_feedback_mood', {
+      mood,
+      duration: completedEntry?.duration,
+      level: completedEntry?.level,
+      music: completedEntry?.music,
+      variation: completedEntry?.variation,
+    });
+    // Auto-focus textarea so mobile keyboard opens immediately
+    setTimeout(() => textareaRef.current?.focus(), 300);
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedMood) return;
+    setSaving(true);
+    try {
+      await supabase.from('session_feedback').insert({
+        mood: selectedMood,
+        nota: nota.trim() || null,
+        duration: completedEntry?.duration ?? null,
+        level: completedEntry?.level ?? null,
+        music: completedEntry?.music ?? null,
+        variation: completedEntry?.variation ?? null,
+      });
+      captureEvent('session_feedback_submitted', {
+        mood: selectedMood ?? undefined,
+        has_nota: nota.trim().length > 0,
+        duration: completedEntry?.duration,
+        level: completedEntry?.level,
+        music: completedEntry?.music,
+        variation: completedEntry?.variation,
+      });
+    } catch (err) {
+      console.error('Feedback save failed:', err);
+    } finally {
+      setSaving(false);
+      onDone();
+    }
+  };
+
+  // Reset state whenever the screen becomes visible again
+  useEffect(() => {
+    if (visible) {
+      setSelectedMood(null);
+      setNota('');
+      setSaving(false);
+    }
+  }, [visible]);
+
+  return (
+    <div className={`feedback-wrap${visible ? ' visible' : ''}`}>
+      <div className="feedback-card">
+        <div className="session-end-glyph">◎</div>
+        <h2 className="feedback-title">Sesión completa</h2>
+        <p className="feedback-subtitle">¿Cómo fue tu práctica?</p>
+
+        {/* Mood grid */}
+        <div className="mood-grid">
+          {MOOD_OPTIONS.map(({ id, emoji, label }) => (
+            <button
+              key={id}
+              className={`mood-btn${selectedMood === id ? ' selected' : ''}`}
+              data-mood={id}
+              onClick={() => handleMoodSelect(id)}
+            >
+              <span className="mood-emoji">{emoji}</span>
+              <span className="mood-label">{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Textarea — appears immediately after mood tap, no extra click needed */}
+        <div className={`nota-reveal${selectedMood ? ' open' : ''}`}>
+          <textarea
+            ref={textareaRef}
+            className="nota-box"
+            placeholder="Lo que surgió, lo que sentiste, lo que necesitás recordar…"
+            value={nota}
+            onChange={e => setNota(e.target.value)}
+            rows={3}
+          />
+        </div>
+
+        {selectedMood && (
+          <button className="feedback-submit" onClick={handleSubmit} disabled={saving}>
+            {saving ? 'Guardando…' : 'Guardar'}
+          </button>
+        )}
+
+        <button className="feedback-skip" onClick={onNewSession}>
+          Omitir · nueva sesión
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Thank-you Screen ──────────────────────────────────────────────── */
+interface ThankyouScreenProps {
+  visible: boolean;
+  onNewSession: () => void;
+}
+
+function ThankyouScreen({ visible, onNewSession }: ThankyouScreenProps) {
+  return (
+    <div className={`feedback-wrap${visible ? ' visible' : ''}`}>
+      <div className="feedback-card">
+        <div className="thankyou-wrap">
+          <span className="thankyou-glyph">✦</span>
+          <h2 className="thankyou-title">Gracias</h2>
+          <p className="thankyou-sub">Tu experiencia nos ayuda a mejorar.</p>
+          <button className="new-session-btn" onClick={onNewSession}>
+            Nueva sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── App ───────────────────────────────────────────────────────────── */
 export default function App() {
   const [repoLog, setRepoLog] = useState<MeditationLog | null>(null);
@@ -500,6 +946,11 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.75);
+
+  // Screen state: 'player' | 'feedback' | 'thankyou'
+  const [screen, setScreen] = useState<AppScreen>('player');
+  // The entry that just completed, kept for PostHog context in feedback
+  const [completedEntry, setCompletedEntry] = useState<MeditationLogEntry | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const tickRef = useRef<number | null>(null);
@@ -579,6 +1030,7 @@ export default function App() {
     setAudioUrl(url);
     setCurrentTime(0);
     setPlaying(false);
+    setScreen('player'); // make sure we're on the player
 
     captureEvent('meditation_started', {
       duration: entry.duration,
@@ -588,19 +1040,16 @@ export default function App() {
       model: entry.model,
     });
 
-    // give React a tick to render the <audio> with new src
     setTimeout(() => {
       const a = audioRef.current;
       if (!a) return;
       a.load();
       a.play().then(() => setPlaying(true)).catch(console.error);
-      setDuration(0); // will be set by onLoadedMetadata
+      setDuration(0);
     }, 50);
   };
 
-  const handleShuffle = () => {
-    handlePlay();
-  };
+  const handleShuffle = () => { handlePlay(); };
 
   const togglePlayPause = () => {
     const a = audioRef.current;
@@ -630,8 +1079,34 @@ export default function App() {
     setCurrentTime(Math.floor(pct * duration));
   };
 
-  const progressPct = duration > 0 ? Math.round((currentTime / duration) * 100) : 0;
+  /* Session ended → begin gong crossfade into feedback */
+  const handleSessionEnd = () => {
+    setPlaying(false);
+    setCurrentTime(0);
+    captureEvent('meditation_completed', selectedEntry ? {
+      duration: selectedEntry.duration,
+      level: selectedEntry.level,
+      music: selectedEntry.music,
+      variation: selectedEntry.variation,
+    } : undefined);
+    setCompletedEntry(selectedEntry);
+    // The gongs are the last ~15s of the audio, so by the time onEnded fires
+    // the transition is already emotionally complete. We start the fade immediately.
+    setScreen('feedback');
+  };
 
+  const handleFeedbackDone = () => { setScreen('thankyou'); };
+
+  const handleNewSession = () => {
+    setScreen('player');
+    setAudioUrl(null);
+    setSelectedEntry(null);
+    setCompletedEntry(null);
+    setPlaying(false);
+    setCurrentTime(0);
+  };
+
+  const progressPct = duration > 0 ? Math.round((currentTime / duration) * 100) : 0;
   const variantCount = getMatchingEntries().length;
   const selectionComplete = allSelected && isAvailable();
 
@@ -639,209 +1114,185 @@ export default function App() {
     <>
       <style>{css}</style>
 
-      {/* Full-viewport dark backdrop — fills the whole screen on desktop */}
       <div className="backdrop" />
 
-      <div className="shell">
-        {/* Ambient orbs — vw-based so they scale with the viewport */}
+      {/*
+        We keep player + feedback in the same stacking context.
+        The player fades out as feedback fades in via CSS opacity transitions.
+      */}
+      <div style={{ position: 'relative', minHeight: '100vh' }}>
+
+        {/* ── Ambient orbs (shared across screens) ── */}
         <div className="orb orb-1" />
         <div className="orb orb-2" />
         <div className="orb orb-3" />
 
-        <div className="card">
-          {/* Header */}
-          <p className="tod">{getTimeOfDay()}</p>
-          <h1 className="brand-title">Bhavana</h1>
-          <p className="tagline">un momento solo para ti</p>
+        {/* ── PLAYER SCREEN ── */}
+        <div className={`shell fade-wrap${screen !== 'player' ? ' hidden' : ''}`}>
+          <div className="card">
+            {/* Header */}
+            <p className="tod">{getTimeOfDay()}</p>
+            <h1 className="brand-title">Bhavana</h1>
+            <p className="tagline">un momento solo para ti</p>
 
-          {/* Loading */}
-          {loadingOptions && <p className="loading-msg">cargando sesiones…</p>}
+            {loadingOptions && <p className="loading-msg">cargando sesiones…</p>}
 
-          {/* Pills */}
-          {!loadingOptions && (
-            <>
-              <div className="pill-group">
-                <p className="pill-label">Duración</p>
-                <div className="pills">
-                  {getUniqueDurations().map(d => (
-                    <div
-                      key={d}
-                      className={`pill${duracion === d ? ' active' : ''}`}
-                      onClick={() => {
-                        setDuracion(d);
-                        setAudioUrl(null);
-                        setSelectedEntry(null);
-                        setPlaying(false);
-                        setCurrentTime(0);
-                      }}
-                    >
-                      {formatDuration(d)}
-                    </div>
-                  ))}
+            {!loadingOptions && (
+              <>
+                <div className="pill-group">
+                  <p className="pill-label">Duración</p>
+                  <div className="pills">
+                    {getUniqueDurations().map(d => (
+                      <div
+                        key={d}
+                        className={`pill${duracion === d ? ' active' : ''}`}
+                        onClick={() => { setDuracion(d); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                      >
+                        {formatDuration(d)}
+                      </div>
+                    ))}
+                  </div>
                 </div>
+
+                <div className="pill-group">
+                  <p className="pill-label">Nivel</p>
+                  <div className="pills">
+                    {getUniqueLevels().map(l => (
+                      <div
+                        key={l}
+                        className={`pill${nivel === l ? ' active' : ''}`}
+                        onClick={() => { setNivel(l); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                      >
+                        {capitalize(l)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pill-group">
+                  <p className="pill-label">Música</p>
+                  <div className="pills">
+                    {getUniqueMusicOptions().map(m => (
+                      <div
+                        key={m}
+                        className={`pill${musica === m ? ' active' : ''}`}
+                        onClick={() => { setMusica(m); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                      >
+                        {capitalize(m)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {allSelected && !isAvailable() && (
+                  <p className="unavailable">esta combinación no está disponible aún</p>
+                )}
+              </>
+            )}
+
+            <div className="divider" />
+
+            {/* Breathing ring */}
+            <div className="ring-wrap">
+              <div
+                className={`ring${playing ? ' playing' : ''}`}
+                onClick={audioUrl ? togglePlayPause : (selectionComplete ? handlePlay : undefined)}
+                role="button"
+                aria-label={playing ? 'Pausar meditación' : 'Iniciar meditación'}
+                style={{ cursor: selectionComplete || audioUrl ? 'pointer' : 'default', opacity: selectionComplete || audioUrl ? 1 : 0.4 }}
+              >
+                <span className="ring-icon">
+                  {playing ? <IconPause /> : <IconPlay />}
+                </span>
               </div>
 
-              <div className="pill-group">
-                <p className="pill-label">Nivel</p>
-                <div className="pills">
-                  {getUniqueLevels().map(l => (
-                    <div
-                      key={l}
-                      className={`pill${nivel === l ? ' active' : ''}`}
-                      onClick={() => {
-                        setNivel(l);
-                        setAudioUrl(null);
-                        setSelectedEntry(null);
-                        setPlaying(false);
-                        setCurrentTime(0);
-                      }}
-                    >
-                      {capitalize(l)}
-                    </div>
-                  ))}
-                </div>
+              <p className={`session-label${selectedEntry ? ' active' : ''}`}>
+                {selectedEntry
+                  ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level)} · ${capitalize(selectedEntry.music)} · var. ${selectedEntry.variation}`
+                  : allSelected && !isAvailable()
+                    ? ''
+                    : 'elige tu sesión y presiona para comenzar'}
+              </p>
+            </div>
+
+            {/* Progress */}
+            <div className="progress-area">
+              <div className="progress-track" onClick={handleSeek}>
+                <div className="progress-fill" style={{ width: `${progressPct}%` }} />
+              </div>
+              <div className="time-labels">
+                <span>{formatTime(currentTime)}</span>
+                <span>{duration > 0 ? formatTime(Math.floor(duration)) : '--:--'}</span>
+              </div>
+            </div>
+
+            {/* Bottom controls */}
+            <div className="bottom-row">
+              <button className="icon-btn" onClick={handleShuffle} disabled={!selectionComplete} aria-label="Otra variación aleatoria" title="Otra variación">
+                <IconShuffle />
+              </button>
+
+              <div className="vol-wrap">
+                <IconVolume />
+                <input
+                  type="range"
+                  className="vol-slider"
+                  min={0} max={1} step={0.01}
+                  value={volume}
+                  onChange={e => setVolume(parseFloat(e.target.value))}
+                  aria-label="Volumen"
+                />
               </div>
 
-              <div className="pill-group">
-                <p className="pill-label">Música</p>
-                <div className="pills">
-                  {getUniqueMusicOptions().map(m => (
-                    <div
-                      key={m}
-                      className={`pill${musica === m ? ' active' : ''}`}
-                      onClick={() => {
-                        setMusica(m);
-                        setAudioUrl(null);
-                        setSelectedEntry(null);
-                        setPlaying(false);
-                        setCurrentTime(0);
-                      }}
-                    >
-                      {capitalize(m)}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Unavailable notice */}
-              {allSelected && !isAvailable() && (
-                <p className="unavailable">esta combinación no está disponible aún</p>
-              )}
-            </>
-          )}
-
-          <div className="divider" />
-
-          {/* Breathing ring */}
-          <div className="ring-wrap">
-            <div
-              className={`ring${playing ? ' playing' : ''}`}
-              onClick={audioUrl ? togglePlayPause : (selectionComplete ? handlePlay : undefined)}
-              role="button"
-              aria-label={playing ? 'Pausar meditación' : 'Iniciar meditación'}
-              style={{ cursor: selectionComplete || audioUrl ? 'pointer' : 'default', opacity: selectionComplete || audioUrl ? 1 : 0.4 }}
-            >
-              <span className="ring-icon">
-                {playing ? <IconPause /> : <IconPlay />}
-              </span>
+              <a
+                className="icon-btn"
+                href={audioUrl ?? '#'}
+                download={selectedEntry ? `${parseDurationMinutes(selectedEntry.duration)}_${selectedEntry.level}_${selectedEntry.variation}.opus` : undefined}
+                aria-label="Descargar meditación"
+                title="Descargar"
+                style={{ pointerEvents: audioUrl ? 'auto' : 'none', opacity: audioUrl ? 1 : 0.2, textDecoration: 'none' }}
+                onClick={() => captureEvent('meditation_downloaded', selectedEntry ? {
+                  duration: selectedEntry.duration,
+                  level: selectedEntry.level,
+                  music: selectedEntry.music,
+                  variation: selectedEntry.variation,
+                } : undefined)}
+              >
+                <IconDownload />
+              </a>
             </div>
 
-            <p className={`session-label${selectedEntry ? ' active' : ''}`}>
-              {selectedEntry
-                ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level)} · ${capitalize(selectedEntry.music)} · var. ${selectedEntry.variation}`
-                : allSelected && !isAvailable()
-                  ? ''
-                  : 'elige tu sesión y presiona para comenzar'}
-            </p>
+            {selectionComplete && (
+              <p className="var-hint">
+                {variantCount} variación{variantCount !== 1 ? 'es' : ''} disponible{variantCount !== 1 ? 's' : ''}
+                {variantCount > 1 && <> · <button onClick={handleShuffle}>cambiar variación</button></>}
+              </p>
+            )}
           </div>
-
-          {/* Progress */}
-          <div className="progress-area">
-            <div className="progress-track" onClick={handleSeek}>
-              <div className="progress-fill" style={{ width: `${progressPct}%` }} />
-            </div>
-            <div className="time-labels">
-              <span>{formatTime(currentTime)}</span>
-              <span>{duration > 0 ? formatTime(Math.floor(duration)) : '--:--'}</span>
-            </div>
-          </div>
-
-          {/* Bottom controls */}
-          <div className="bottom-row">
-            <button
-              className="icon-btn"
-              onClick={handleShuffle}
-              disabled={!selectionComplete}
-              aria-label="Otra variación aleatoria"
-              title="Otra variación"
-            >
-              <IconShuffle />
-            </button>
-
-            <div className="vol-wrap">
-              <IconVolume />
-              <input
-                type="range"
-                className="vol-slider"
-                min={0}
-                max={1}
-                step={0.01}
-                value={volume}
-                onChange={e => setVolume(parseFloat(e.target.value))}
-                aria-label="Volumen"
-              />
-            </div>
-
-            <a
-              className="icon-btn"
-              href={audioUrl ?? '#'}
-              download={selectedEntry
-                ? `${parseDurationMinutes(selectedEntry.duration)}_${selectedEntry.level}_${selectedEntry.variation}.opus`
-                : undefined}
-              aria-label="Descargar meditación"
-              title="Descargar"
-              style={{ pointerEvents: audioUrl ? 'auto' : 'none', opacity: audioUrl ? 1 : 0.2, textDecoration: 'none' }}
-              onClick={() => captureEvent('meditation_downloaded', selectedEntry ? {
-                duration: selectedEntry.duration,
-                level: selectedEntry.level,
-                music: selectedEntry.music,
-                variation: selectedEntry.variation,
-              } : undefined)}
-            >
-              <IconDownload />
-            </a>
-          </div>
-
-          {/* Variation hint */}
-          {selectionComplete && (
-            <p className="var-hint">
-              {variantCount} variación{variantCount !== 1 ? 'es' : ''} disponible{variantCount !== 1 ? 's' : ''}
-              {variantCount > 1 && (
-                <> · <button onClick={handleShuffle}>cambiar variación</button></>
-              )}
-            </p>
-          )}
         </div>
+
+        {/* ── FEEDBACK SCREEN ── */}
+        <FeedbackScreen
+          visible={screen === 'feedback'}
+          completedEntry={completedEntry}
+          onDone={handleFeedbackDone}
+          onNewSession={handleNewSession}
+        />
+
+        {/* ── THANK-YOU SCREEN ── */}
+        <ThankyouScreen
+          visible={screen === 'thankyou'}
+          onNewSession={handleNewSession}
+        />
       </div>
 
-      {/* Hidden real audio element */}
+      {/* Hidden audio element */}
       {audioUrl && (
         <audio
           ref={audioRef}
           src={audioUrl}
-          onLoadedMetadata={() => {
-            if (audioRef.current) setDuration(audioRef.current.duration);
-          }}
-          onEnded={() => {
-            setPlaying(false);
-            setCurrentTime(0);
-            captureEvent('meditation_completed', selectedEntry ? {
-              duration: selectedEntry.duration,
-              level: selectedEntry.level,
-              music: selectedEntry.music,
-              variation: selectedEntry.variation,
-            } : undefined);
-          }}
+          onLoadedMetadata={() => { if (audioRef.current) setDuration(audioRef.current.duration); }}
+          onEnded={handleSessionEnd}
         />
       )}
     </>
