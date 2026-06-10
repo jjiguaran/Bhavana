@@ -1,19 +1,22 @@
 """
-Script to batch-generate binaural meditation audio by mixing solfeggio background
-into existing silence meditations.
+Script to batch-generate meditation audio variations by mixing background sounds
+(binaural solfeggio or nature sounds) into existing silence meditations.
 
 The workflow:
 1. Read meditations/meditations_repo_log.json from R2
-2. Find all silence entries that don't yet have a binaural counterpart
-3. For each missing meditation, download the silence audio, mix with solfeggio
-   background (avoiding the opening/closing gong), and upload to meditations/binaural/
-4. Update the meditations log with new binaural entries
+2. Find all silence entries that don't yet have a counterpart for the chosen mode
+3. For each missing meditation, download the silence audio, mix with the chosen
+   background, and upload to meditations/{mode}/
+4. Update the meditations log with new entries
 
 Usage:
-    python src/audio_mixing.py
+    python src/audio_mixing.py --mode binaural
+    python src/audio_mixing.py --mode nature
     
     Optional arguments:
+    --mode              'binaural' or 'nature' (default: binaural)
     --solfeggio-key     R2 key for the solfeggio background (default: sounds/solfeggio-mix-285-528-852-hz.mp3)
+    --nature-key        R2 key for the nature background (default: sounds/soundreality-stream-nature-445380.mp3)
     --gong-key          R2 key for the gong sound (default: sounds/freesound_community-gong-79191.mp3)
     --background-volume Volume level for background (0.0-1.0, default: 0.05)
     --fade-duration     Fade in/out duration in seconds (default: 3.0)
@@ -119,7 +122,7 @@ def build_audio_key(entry, subdirectory="silence"):
     
     Args:
         entry: dict with 'duration', 'level', 'variation' keys
-        subdirectory: 'silence' or 'binaural'
+        subdirectory: 'silence', 'binaural', or 'nature'
     """
     duration_str = entry.get('duration', '')
     match = re.match(r'(\d+)', duration_str)
@@ -132,6 +135,8 @@ def build_audio_key(entry, subdirectory="silence"):
 def mix_solfeggio_with_meditation(r2, bucket_name, meditation_key, solfeggio_key, gong_key,
                                    background_volume=0.05, fade_duration=3.0, target_sr=44100):
     """Download audio files, mix solfeggio background into meditation, return mixed AudioSegment.
+    
+    The solfeggio background plays only in the middle section between the opening/closing gongs.
     
     Args:
         r2: R2 client
@@ -242,10 +247,132 @@ def mix_solfeggio_with_meditation(r2, bucket_name, meditation_key, solfeggio_key
     return mixed_audio
 
 
+def mix_nature_with_meditation(r2, bucket_name, meditation_key, nature_key, gong_key,
+                                background_volume=0.05, fade_duration=3.0, target_sr=44100):
+    """Download audio files, mix nature background into meditation, return mixed AudioSegment.
+    
+    The nature background plays only in the middle section between the opening/closing gongs,
+    respecting the same gong structure as the binaural version. The gong audio is already
+    part of the original silence meditation, so only its duration is used for gating.
+    
+    Args:
+        r2: R2 client
+        bucket_name: R2 bucket name
+        meditation_key: R2 key for the silence meditation audio
+        nature_key: R2 key for the nature background sound
+        gong_key: R2 key for the gong sound (used only for duration measurement)
+        background_volume: volume level for background (0.0-1.0)
+        fade_duration: fade in/out duration in seconds
+        target_sr: target sample rate
+        
+    Returns:
+        AudioSegment with mixed audio, or None on error
+    """
+    print("\n📥 Downloading audio files from R2...")
+    
+    meditation_path = download_from_r2(r2, bucket_name, meditation_key)
+    if meditation_path is None:
+        print(f"  ❌ Cannot proceed: meditation file not found ({meditation_key})")
+        return None
+
+    nature_path = download_from_r2(r2, bucket_name, nature_key)
+    if nature_path is None:
+        print(f"  ❌ Cannot proceed: nature file not found ({nature_key})")
+        return None
+
+    gong_path = download_from_r2(r2, bucket_name, gong_key)
+    if gong_path is None:
+        print(f"  ❌ Cannot proceed: gong file not found ({gong_key})")
+        return None
+
+    # ── Load audio files ────────────────────────────────────────────────
+    print("\n🔊 Loading audio files...")
+    meditation = AudioSegment.from_file(meditation_path).set_frame_rate(target_sr).set_channels(2)
+    nature = AudioSegment.from_file(nature_path).set_frame_rate(target_sr).set_channels(2)
+    gong = AudioSegment.from_file(gong_path).set_frame_rate(target_sr).set_channels(2)
+
+    # ── Compute durations ──────────────────────────────────────────────
+    gong_duration_ms = len(gong)
+    gong_duration_s = gong_duration_ms / 1000.0
+    meditation_duration_ms = len(meditation)
+    meditation_duration_s = meditation_duration_ms / 1000.0
+    nature_duration_s = len(nature) / 1000.0
+
+    print(f"\n📊 Durations:")
+    print(f"  Gong sound:          {gong_duration_s:.2f} s")
+    print(f"  Original meditation: {meditation_duration_s:.2f} s")
+    print(f"  Nature track:        {nature_duration_s:.2f} s")
+
+    # Validate that the meditation is long enough to contain two gongs
+    if meditation_duration_ms <= 2 * gong_duration_ms:
+        print(f"  ❌ Meditation ({meditation_duration_s:.1f}s) is shorter than "
+              f"2× gong duration ({2 * gong_duration_s:.1f}s). Skipping.")
+        return None
+
+    # The background should play during the middle section only
+    background_duration_ms = meditation_duration_ms - 2 * gong_duration_ms
+    background_duration_s = background_duration_ms / 1000.0
+    print(f"  Background section: {background_duration_s:.2f} s "
+          f"(meditation minus 2× gong)")
+
+    # ── Prepare the background track ────────────────────────────────────
+    print("\n🎛️  Preparing nature background...")
+
+    # Loop or trim the nature track to match the exact background duration
+    if len(nature) >= background_duration_ms:
+        background = nature[:background_duration_ms]
+        print(f"  Trimmed nature track to {background_duration_s:.1f}s")
+    else:
+        repeats = int(np.ceil(background_duration_ms / len(nature)))
+        background = nature * repeats
+        background = background[:background_duration_ms]
+        print(f"  Looped nature track {repeats}x to fill {background_duration_s:.1f}s")
+
+    # Apply fade in and fade out to avoid abrupt transitions
+    fade_ms = int(fade_duration * 1000)
+    if fade_ms > 0:
+        background = background.fade_in(fade_ms).fade_out(fade_ms)
+        print(f"  Applied {fade_duration}s fade in/out")
+
+    # Reduce background volume relative to the original meditation
+    if background_volume < 1.0:
+        gain_db = 20 * math.log10(background_volume)
+        background = background.apply_gain(gain_db)
+        print(f"  Background volume adjusted to {background_volume:.0%} "
+              f"(gain: {gain_db:+.1f} dB)")
+
+    # ── Position the background ─────────────────────────────────────────
+    print("\n🔄 Mixing audio tracks...")
+
+    # Create leading and trailing silence for the gong sections
+    silence_before = AudioSegment.silent(duration=gong_duration_ms, frame_rate=target_sr)
+    silence_after = AudioSegment.silent(duration=gong_duration_ms, frame_rate=target_sr)
+
+    # Build the full background track with silence where gongs play
+    full_background = silence_before + background + silence_after
+
+    # Ensure the background track matches the meditation duration exactly
+    if len(full_background) > meditation_duration_ms:
+        full_background = full_background[:meditation_duration_ms]
+    elif len(full_background) < meditation_duration_ms:
+        pad_ms = meditation_duration_ms - len(full_background)
+        full_background = full_background + AudioSegment.silent(duration=pad_ms, frame_rate=target_sr)
+
+    # Mix: overlay the background onto the original meditation
+    mixed_audio = meditation.overlay(full_background)
+    
+    return mixed_audio
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description='Batch-generate binaural meditations by mixing solfeggio background '
-                    'into all silence meditations that lack a binaural version.'
+        description='Batch-generate meditation variations (binaural or nature) by mixing '
+                    'background sounds into all silence meditations that lack the target version.'
+    )
+    parser.add_argument(
+        '--mode', type=str, choices=['binaural', 'nature'], default='binaural',
+        help='Generation mode: "binaural" mixes solfeggio between gongs, '
+             '"nature" mixes nature sounds throughout (default: binaural)'
     )
     parser.add_argument(
         '--solfeggio-key', type=str,
@@ -253,22 +380,48 @@ def main():
         help='R2 key for the solfeggio background sound (default: sounds/solfeggio-mix-285-528-852-hz.mp3)'
     )
     parser.add_argument(
+        '--nature-key', type=str,
+        default='sounds/soundreality-stream-nature-445380.mp3',
+        help='R2 key for the nature background sound (default: sounds/soundreality-stream-nature-445380.mp3)'
+    )
+    parser.add_argument(
         '--gong-key', type=str,
         default='sounds/freesound_community-gong-79191.mp3',
         help='R2 key for the gong sound file (default: sounds/freesound_community-gong-79191.mp3)'
     )
     parser.add_argument(
-        '--background-volume', type=float, default=0.05,
-        help='Volume level for the background relative to original (0.0-1.0, default: 0.05)'
+        '--background-volume', type=float,
+        help='Volume level for the background relative to original (0.0-1.0). '
+             'Defaults to 0.05 for binaural, 0.025 for nature.'
     )
     parser.add_argument(
         '--fade-duration', type=float, default=3.0,
         help='Fade in/out duration for the background in seconds (default: 3.0)'
     )
+    parser.add_argument(
+        '--target-subdirectory', type=str,
+        help='Override the target subdirectory (defaults to the mode name, e.g. "binaural" or "nature")'
+    )
     args = parser.parse_args()
 
+    mode = args.mode
+    target_subdirectory = args.target_subdirectory if args.target_subdirectory else mode
+
+    # Set background volume default based on mode (nature at half of binaural)
+    if args.background_volume is not None:
+        background_volume = args.background_volume
+    else:
+        background_volume = 0.05 if mode == 'binaural' else 0.025
+
+    MODE_LABELS = {
+        'binaural': ('binaural', '🎵 Batch Binaural Meditation Generator'),
+        'nature': ('nature', '🌿 Batch Nature Background Meditation Generator'),
+    }
+
+    music_label, title = MODE_LABELS[mode]
+
     print("=" * 60)
-    print("🎵 Batch Binaural Meditation Generator")
+    print(title)
     print("=" * 60)
 
     # ── Validate credentials ────────────────────────────────────────────
@@ -299,41 +452,41 @@ def main():
     all_entries = meditations_log.get("meditations", [])
     print(f"   Found {len(all_entries)} meditation entrie(s) in the log.")
 
-    # ── Separate silence and binaural entries ───────────────────────────
+    # ── Separate silence entries from target-mode entries ───────────────
     silence_entries = [e for e in all_entries if e.get('music') == 'silence']
-    binaural_entries = [e for e in all_entries if e.get('music') == 'binaural']
+    target_entries = [e for e in all_entries if e.get('music') == music_label]
 
-    print(f"\n   Silence meditations:   {len(silence_entries)}")
-    print(f"   Binaural meditations:  {len(binaural_entries)}")
+    print(f"\n   Silence meditations:    {len(silence_entries)}")
+    print(f"   {music_label.capitalize()} meditations:   {len(target_entries)}")
 
-    # Build a set of (duration, level, variation) tuples already in binaural
-    binaural_set = set()
-    for e in binaural_entries:
-        binaural_set.add((
+    # Build a set of (duration, level, variation) tuples already in the target mode
+    target_set = set()
+    for e in target_entries:
+        target_set.add((
             e.get('duration'),
             e.get('level'),
             e.get('variation')
         ))
 
-    # ── Find silence entries that need a binaural version ───────────────
+    # ── Find silence entries that need a target-mode version ────────────
     missing = []
     for entry in silence_entries:
         key = (entry.get('duration'), entry.get('level'), entry.get('variation'))
-        if key not in binaural_set:
+        if key not in target_set:
             missing.append(entry)
 
-    print(f"\n🎯 Found {len(missing)} meditation(s) that need binaural versions:")
+    print(f"\n🎯 Found {len(missing)} meditation(s) that need {mode} versions:")
 
     if not missing:
-        print("\n✅ All silence meditations already have a binaural version. Nothing to do.")
+        print(f"\n✅ All silence meditations already have a {mode} version. Nothing to do.")
         return
 
     for m in missing:
         silence_key = build_audio_key(m, "silence")
-        binaural_key = build_audio_key(m, "binaural")
+        target_key = build_audio_key(m, target_subdirectory)
         print(f"   - {m.get('duration')} | {m.get('level')} | variation {m.get('variation')}")
         print(f"     📥 {silence_key}")
-        print(f"     📤 {binaural_key}")
+        print(f"     📤 {target_key}")
 
     # ── Process each missing meditation ─────────────────────────────────
     target_sr = 44100
@@ -345,23 +498,34 @@ def main():
         variation = entry.get('variation', 1)
 
         silence_key = build_audio_key(entry, "silence")
-        binaural_key = build_audio_key(entry, "binaural")
+        target_key = build_audio_key(entry, target_subdirectory)
 
         print(f"\n{'='*60}")
-        print(f"[{i}/{len(missing)}] Generating: {duration_str} | {level} | variation {variation}")
+        print(f"[{i}/{len(missing)}] Generating {mode}: {duration_str} | {level} | variation {variation}")
         print(f"   Source: {silence_key}")
-        print(f"   Target: {binaural_key}")
+        print(f"   Target: {target_key}")
 
-        # ── Mix solfeggio into meditation ───────────────────────────────
-        mixed_audio = mix_solfeggio_with_meditation(
-            r2, bucket_name,
-            meditation_key=silence_key,
-            solfeggio_key=args.solfeggio_key,
-            gong_key=args.gong_key,
-            background_volume=args.background_volume,
-            fade_duration=args.fade_duration,
-            target_sr=target_sr
-        )
+        # ── Mix background into meditation ──────────────────────────────
+        if mode == 'binaural':
+            mixed_audio = mix_solfeggio_with_meditation(
+                r2, bucket_name,
+                meditation_key=silence_key,
+                solfeggio_key=args.solfeggio_key,
+                gong_key=args.gong_key,
+                background_volume=background_volume,
+                fade_duration=args.fade_duration,
+                target_sr=target_sr
+            )
+        else:  # mode == 'nature'
+            mixed_audio = mix_nature_with_meditation(
+                r2, bucket_name,
+                meditation_key=silence_key,
+                nature_key=args.nature_key,
+                gong_key=args.gong_key,
+                background_volume=background_volume,
+                fade_duration=args.fade_duration,
+                target_sr=target_sr
+            )
 
         if mixed_audio is None:
             print(f"   ⚠️ Skipping {silence_key} due to processing error.")
@@ -378,7 +542,7 @@ def main():
         print(f"  ⏱️  Mixed audio duration: {mixed_duration_s:.2f} s")
 
         print("\n☁️  Uploading to Cloudflare R2...")
-        upload_bytes_to_r2(r2, bucket_name, opus_bytes, binaural_key)
+        upload_bytes_to_r2(r2, bucket_name, opus_bytes, target_key)
 
         # ── Update meditations log ──────────────────────────────────────
         new_entry = {
@@ -387,7 +551,7 @@ def main():
             "variation": variation,
             "model": entry.get('model', 'unknown'),
             "date_generated": date.today().strftime("%Y-%m-%d"),
-            "music": "binaural"
+            "music": music_label
         }
         meditations_log["meditations"].append(new_entry)
         upload_json_to_r2(
@@ -395,7 +559,7 @@ def main():
             "meditations/meditations_repo_log.json",
             meditations_log
         )
-        print(f"   🎉 Complete: {binaural_key}")
+        print(f"   🎉 Complete: {target_key}")
         success_count += 1
 
     # ── Update local copy of the log ────────────────────────────────────
@@ -409,7 +573,7 @@ def main():
 
     # ── Summary ─────────────────────────────────────────────────────────
     print(f"\n{'='*60}")
-    print(f"✅ Batch complete! Generated {success_count} new binaural meditation(s).")
+    print(f"✅ Batch complete! Generated {success_count} new {mode} meditation(s).")
     print("=" * 60)
 
 
