@@ -701,11 +701,12 @@ const css = `
 /* ─── Types ─────────────────────────────────────────────────────────── */
 interface MeditationLogEntry {
   duration: string;
-  level: string;
-  variation: number;
-  model: string;
+  level: string | null;
+  variation: number | null;
+  model: string | null;
   date_generated: string;
   music: string;
+  guided: boolean;
 }
 
 interface MeditationLog {
@@ -734,7 +735,11 @@ function parseDurationMinutes(duration: string): number {
 
 function buildR2Url(entry: MeditationLogEntry): string {
   const durationNum = parseDurationMinutes(entry.duration);
-  return `${R2_BUCKET_URL}/meditations/${entry.music}/${durationNum}_${entry.level}_${entry.variation}.opus`;
+  if (entry.guided) {
+    return `${R2_BUCKET_URL}/meditations/${entry.music}/${durationNum}_${entry.level}_${entry.variation}.opus`;
+  } else {
+    return `${R2_BUCKET_URL}/meditations/mute/${durationNum}_${entry.music}.opus`;
+  }
 }
 
 function formatDuration(duration: string): string {
@@ -757,6 +762,14 @@ function getTimeOfDay(): string {
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function musicDisplayName(key: string): string {
+  const labels: Record<string, string> = {
+    nature: 'Naturaleza',
+    silence: 'Silencio',
+  };
+  return labels[key] ?? capitalize(key);
 }
 
 /* ─── SVG icon components ───────────────────────────────────────────── */
@@ -815,10 +828,10 @@ function FeedbackScreen({ visible, completedEntry, onDone, onNewSession }: Feedb
     setSelectedMood(mood);
     captureEvent('session_feedback_mood', {
       mood,
-      duration: completedEntry?.duration,
-      level: completedEntry?.level,
-      music: completedEntry?.music,
-      variation: completedEntry?.variation,
+      duration: completedEntry?.duration ?? undefined,
+      level: completedEntry?.level ?? undefined,
+      music: completedEntry?.music ?? undefined,
+      variation: completedEntry?.variation ?? undefined,
     });
     // Auto-focus textarea so mobile keyboard opens immediately
     setTimeout(() => textareaRef.current?.focus(), 300);
@@ -839,10 +852,10 @@ function FeedbackScreen({ visible, completedEntry, onDone, onNewSession }: Feedb
       captureEvent('session_feedback_submitted', {
         mood: selectedMood ?? undefined,
         has_nota: nota.trim().length > 0,
-        duration: completedEntry?.duration,
-        level: completedEntry?.level,
-        music: completedEntry?.music,
-        variation: completedEntry?.variation,
+        duration: completedEntry?.duration ?? undefined,
+        level: completedEntry?.level ?? undefined,
+        music: completedEntry?.music ?? undefined,
+        variation: completedEntry?.variation ?? undefined,
       });
     } catch (err) {
       console.error('Feedback save failed:', err);
@@ -938,6 +951,7 @@ export default function App() {
   const [duracion, setDuracion] = useState<string>('');
   const [nivel, setNivel] = useState<string>('');
   const [musica, setMusica] = useState<string>('');
+  const [tipo, setTipo] = useState<boolean | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<MeditationLogEntry | null>(null);
   const [loadingOptions, setLoadingOptions] = useState<boolean>(true);
@@ -1004,20 +1018,33 @@ export default function App() {
     );
 
   const getUniqueLevels = () =>
-    Array.from(new Set(allEntries.map(e => e.level))).sort();
+    Array.from(new Set(allEntries.map(e => e.level))).filter((l): l is string => l !== null).sort();
 
   const getUniqueMusicOptions = () =>
     Array.from(new Set(allEntries.map(e => e.music))).sort();
 
+  const getUniqueGuidedOptions = (): boolean[] =>
+    Array.from(new Set(allEntries.map(e => e.guided))).sort((a, b) => a === b ? 0 : a ? -1 : 1);
+
   const getMatchingEntries = (): MeditationLogEntry[] => {
-    if (!duracion || !nivel || !musica) return [];
+    if (!duracion || !musica || tipo === null) return [];
+    if (tipo === true && !nivel) return [];
+    if (tipo === true) {
+      return allEntries.filter(
+        e => e.duration === duracion && e.level === nivel && e.music === musica && e.guided === true
+      );
+    }
     return allEntries.filter(
-      e => e.duration === duracion && e.level === nivel && e.music === musica
+      e => e.duration === duracion && e.level === null && e.music === musica && e.guided === false
     );
   };
 
   const isAvailable = () => getMatchingEntries().length > 0;
-  const allSelected = !!(duracion && nivel && musica);
+  const allSelected = tipo === null
+    ? false
+    : tipo === true
+      ? !!(duracion && nivel && musica)
+      : !!(duracion && musica);
 
   const handlePlay = () => {
     const matches = getMatchingEntries();
@@ -1034,10 +1061,10 @@ export default function App() {
 
     captureEvent('meditation_started', {
       duration: entry.duration,
-      level: entry.level,
+      level: entry.level ?? undefined,
       music: entry.music,
-      variation: entry.variation,
-      model: entry.model,
+      variation: entry.variation ?? undefined,
+      model: entry.model ?? undefined,
     });
 
     setTimeout(() => {
@@ -1059,9 +1086,9 @@ export default function App() {
       setPlaying(false);
       captureEvent('meditation_paused', selectedEntry ? {
         duration: selectedEntry.duration,
-        level: selectedEntry.level,
+        level: selectedEntry.level ?? undefined,
         music: selectedEntry.music,
-        variation: selectedEntry.variation,
+        variation: selectedEntry.variation ?? undefined,
         progress_seconds: currentTime,
         progress_pct: progressPct,
       } : undefined);
@@ -1085,9 +1112,9 @@ export default function App() {
     setCurrentTime(0);
     captureEvent('meditation_completed', selectedEntry ? {
       duration: selectedEntry.duration,
-      level: selectedEntry.level,
+      level: selectedEntry.level ?? undefined,
       music: selectedEntry.music,
-      variation: selectedEntry.variation,
+      variation: selectedEntry.variation ?? undefined,
     } : undefined);
     setCompletedEntry(selectedEntry);
     // The gongs are the last ~15s of the audio, so by the time onEnded fires
@@ -1140,6 +1167,21 @@ export default function App() {
             {!loadingOptions && (
               <>
                 <div className="pill-group">
+                  <p className="pill-label">Tipo de meditación</p>
+                  <div className="pills">
+                    {getUniqueGuidedOptions().map(g => (
+                      <div
+                        key={g ? 'guided' : 'unguided'}
+                        className={`pill${tipo === g ? ' active' : ''}`}
+                        onClick={() => { setTipo(g); setNivel(''); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                      >
+                        {g ? 'Guiada' : 'En silencio'}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pill-group">
                   <p className="pill-label">Duración</p>
                   <div className="pills">
                     {getUniqueDurations().map(d => (
@@ -1154,6 +1196,7 @@ export default function App() {
                   </div>
                 </div>
 
+                {(tipo === null || tipo === true) && (
                 <div className="pill-group">
                   <p className="pill-label">Nivel</p>
                   <div className="pills">
@@ -1163,14 +1206,15 @@ export default function App() {
                         className={`pill${nivel === l ? ' active' : ''}`}
                         onClick={() => { setNivel(l); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
                       >
-                        {capitalize(l)}
+                        {capitalize(l ?? '')}
                       </div>
                     ))}
                   </div>
                 </div>
+                )}
 
                 <div className="pill-group">
-                  <p className="pill-label">Música</p>
+                  <p className="pill-label">Sonido de fondo</p>
                   <div className="pills">
                     {getUniqueMusicOptions().map(m => (
                       <div
@@ -1178,7 +1222,7 @@ export default function App() {
                         className={`pill${musica === m ? ' active' : ''}`}
                         onClick={() => { setMusica(m); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
                       >
-                        {capitalize(m)}
+                        {musicDisplayName(m)}
                       </div>
                     ))}
                   </div>
@@ -1208,7 +1252,7 @@ export default function App() {
 
               <p className={`session-label${selectedEntry ? ' active' : ''}`}>
                 {selectedEntry
-                  ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level)} · ${capitalize(selectedEntry.music)} · var. ${selectedEntry.variation}`
+                  ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level ?? '')} · ${musicDisplayName(selectedEntry.music)} · var. ${selectedEntry.variation ?? '-'}`
                   : allSelected && !isAvailable()
                     ? ''
                     : 'elige tu sesión y presiona para comenzar'}
@@ -1247,15 +1291,15 @@ export default function App() {
               <a
                 className="icon-btn"
                 href={audioUrl ?? '#'}
-                download={selectedEntry ? `${parseDurationMinutes(selectedEntry.duration)}_${selectedEntry.level}_${selectedEntry.variation}.opus` : undefined}
+                download={selectedEntry ? `${parseDurationMinutes(selectedEntry.duration)}_${selectedEntry.level ?? ''}_${selectedEntry.variation ?? ''}.opus` : undefined}
                 aria-label="Descargar meditación"
                 title="Descargar"
                 style={{ pointerEvents: audioUrl ? 'auto' : 'none', opacity: audioUrl ? 1 : 0.2, textDecoration: 'none' }}
                 onClick={() => captureEvent('meditation_downloaded', selectedEntry ? {
                   duration: selectedEntry.duration,
-                  level: selectedEntry.level,
+                  level: selectedEntry.level ?? undefined,
                   music: selectedEntry.music,
-                  variation: selectedEntry.variation,
+                  variation: selectedEntry.variation ?? undefined,
                 } : undefined)}
               >
                 <IconDownload />
