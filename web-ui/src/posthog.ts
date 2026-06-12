@@ -3,7 +3,7 @@ import posthog from 'posthog-js';
 const POSTHOG_TOKEN = process.env.REACT_APP_POSTHOG_PROJECT_TOKEN;
 
 // 1. Point this by default to your new custom Cloudflare worker domain
-const POSTHOG_HOST = process.env.REACT_APP_POSTHOG_HOST || 'assets.bhavanaapp.com';
+const POSTHOG_HOST = process.env.REACT_APP_POSTHOG_HOST || 'https://assets.bhavanaapp.com';
 
 /** Initialize PostHog once (idempotent). Call at app root. */
 export function initPostHog(): void {
