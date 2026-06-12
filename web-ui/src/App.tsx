@@ -764,6 +764,14 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function musicDisplayName(key: string): string {
+  const labels: Record<string, string> = {
+    nature: 'Naturaleza',
+    silence: 'Silencio',
+  };
+  return labels[key] ?? capitalize(key);
+}
+
 /* ─── SVG icon components ───────────────────────────────────────────── */
 const IconPlay = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1206,7 +1214,7 @@ export default function App() {
                 )}
 
                 <div className="pill-group">
-                  <p className="pill-label">Música</p>
+                  <p className="pill-label">Sonido de fondo</p>
                   <div className="pills">
                     {getUniqueMusicOptions().map(m => (
                       <div
@@ -1214,7 +1222,7 @@ export default function App() {
                         className={`pill${musica === m ? ' active' : ''}`}
                         onClick={() => { setMusica(m); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
                       >
-                        {capitalize(m)}
+                        {musicDisplayName(m)}
                       </div>
                     ))}
                   </div>
@@ -1244,7 +1252,7 @@ export default function App() {
 
               <p className={`session-label${selectedEntry ? ' active' : ''}`}>
                 {selectedEntry
-                  ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level ?? '')} · ${capitalize(selectedEntry.music)} · var. ${selectedEntry.variation ?? '-'}`
+                  ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level ?? '')} · ${musicDisplayName(selectedEntry.music)} · var. ${selectedEntry.variation ?? '-'}`
                   : allSelected && !isAvailable()
                     ? ''
                     : 'elige tu sesión y presiona para comenzar'}
