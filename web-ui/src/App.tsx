@@ -1018,7 +1018,7 @@ export default function App() {
     );
 
   const getUniqueLevels = () =>
-    Array.from(new Set(allEntries.map(e => e.level))).filter((l): l is string => l !== null).sort();
+    Array.from(new Set(allEntries.map(e => e.level))).filter((l): l is string => l !== null).sort().reverse();
 
   const getUniqueMusicOptions = () =>
     Array.from(new Set(allEntries.map(e => e.music))).sort();
