@@ -1,708 +1,6 @@
 {
   "meditations": [
     {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-03",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-04",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-06",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "silence",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
       "duration": "15 min",
       "level": "principiante",
       "variation": 2,
@@ -901,33 +199,6 @@
       "guided": true
     },
     {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "binaural",
-      "guided": true
-    },
-    {
       "duration": "15 min",
       "level": "avanzado",
       "variation": 2,
@@ -1114,564 +385,6 @@
       "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
       "date_generated": "2026-06-09",
       "music": "binaural",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "5 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "10 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "15 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "principiante",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "avanzado",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "30 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "intermedio",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "principiante",
-      "variation": 1,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "principiante",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "60 min",
-      "level": "intermedio",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "avanzado",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "45 min",
-      "level": "avanzado",
-      "variation": 2,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
-      "guided": true
-    },
-    {
-      "duration": "20 min",
-      "level": "intermedio",
-      "variation": 3,
-      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
-      "date_generated": "2026-06-09",
-      "music": "nature",
       "guided": true
     },
     {
@@ -1862,6 +575,758 @@
       "date_generated": "2026-06-10",
       "music": "silence",
       "guided": false
+    },
+    {
+      "duration": "15 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "30 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "60 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "45 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "20 min",
+      "level": "intermedio",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-17",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "15 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "silence"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "15 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "nature"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "5 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "5 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "5 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "principiante",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "intermedio",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 2,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "10 min",
+      "level": "avanzado",
+      "variation": 3,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
+    },
+    {
+      "duration": "15 min",
+      "level": "principiante",
+      "variation": 1,
+      "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+      "date_generated": "2026-06-18",
+      "music": "binaural"
     }
   ]
 }

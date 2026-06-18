@@ -144,12 +144,22 @@ def download_voice_from_r2(r2_client, bucket_name, voice_key, local_path="/tmp/"
         return None
 
 def select_voice_file(voice_files):
-    """Select the first available voice file for cloning"""
+    """Select the tmpteeduw43.mp3 voice file for cloning"""
     if not voice_files:
         print("❌ No voice files found in voices directory")
         return None
     
-    selected = voice_files[0]
+    target_filename = "tmpteeduw43.mp3"
+    selected = None
+    for vf in voice_files:
+        if vf['filename'] == target_filename:
+            selected = vf
+            break
+    
+    if selected is None:
+        print(f"⚠️ Voice file '{target_filename}' not found, falling back to first available")
+        selected = voice_files[0]
+    
     print(f"\n🎙️ Using voice: {selected['filename']}")
     return selected['key']
 
@@ -375,11 +385,15 @@ try:
     
     existing_set = set()
     for m in existing_meditations:
-        existing_set.add((
-            m.get('duration'),
-            m.get('level'),
-            m.get('variation')
-        ))
+        # Only consider meditations with music="silence" as already generated,
+        # so meditations with other music types (e.g. "ocean", "forest") will
+        # be re-generated with silence.
+        if m.get('music') == 'silence':
+            existing_set.add((
+                m.get('duration'),
+                m.get('level'),
+                m.get('variation')
+            ))
     
     missing = []
     for script in all_scripts:
@@ -416,7 +430,7 @@ try:
         if not reference_audio_path:
             print("❌ Failed to download voice file. Aborting.")
         else:
-            ref_text = "Encontré una psicóloga a cinco minutos de tu casa. Si quieres, te puedo dar su número de teléfono."
+            ref_text = "Siéntate con comodidad, cierra los ojos suavemente. Siente cómo tu cuerpo respira solo."
             
             for script_info in missing:
                 duration_str = script_info.get('duration', '')
