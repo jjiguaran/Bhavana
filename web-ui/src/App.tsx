@@ -1039,7 +1039,7 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.75);
-  const [backgroundVolume, setBackgroundVolume] = useState(0.75); // very subtle background level
+  const [backgroundVolume, setBackgroundVolume] = useState(0.15); // very subtle background level
 
   // Screen state: 'player' | 'feedback' | 'thankyou'
   const [screen, setScreen] = useState<AppScreen>('player');
@@ -1176,10 +1176,12 @@ export default function App() {
 
       // Load voice audio
       a.load();
+      a.volume = volume; // 👈 ADD THIS LINE
 
       // Load and start background audio
       if (bg && bgUrl) {
         bg.load();
+        bg.volume = backgroundVolume; // 👈 ADD THIS LINE
         bg.play().catch(console.error);
       }
 
