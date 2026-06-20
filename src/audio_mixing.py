@@ -211,12 +211,6 @@ def mix_solfeggio_with_meditation(r2, bucket_name, meditation_key, solfeggio_key
         background = background[:background_duration_ms]
         print(f"  Looped solfeggio {repeats}x to fill {background_duration_s:.1f}s")
 
-    # Apply fade in and fade out to avoid abrupt transitions
-    fade_ms = int(fade_duration * 1000)
-    if fade_ms > 0:
-        background = background.fade_in(fade_ms).fade_out(fade_ms)
-        print(f"  Applied {fade_duration}s fade in/out")
-
     # Reduce background volume relative to the original meditation
     if background_volume < 1.0:
         gain_db = 20 * math.log10(background_volume)
@@ -318,21 +312,26 @@ def mix_nature_with_meditation(r2, bucket_name, meditation_key, nature_key, gong
     # ── Prepare the background track ────────────────────────────────────
     print("\n🎛️  Preparing nature background...")
 
+    # Trim the nature track to avoid fading at the beginning and end
+    # Use the segment from second 4 to second 120 (116 seconds of clean audio)
+    START_OFFSET_MS = 4_000    # 4 seconds
+    END_OFFSET_MS = 120_000    # 120 seconds
+    if len(nature) > END_OFFSET_MS:
+        nature_trimmed = nature[START_OFFSET_MS:END_OFFSET_MS]
+        print(f"  Trimmed nature track from 4s to 120s (original: {nature_duration_s:.0f}s)")
+    else:
+        nature_trimmed = nature[START_OFFSET_MS:]
+        print(f"  Nature track is under {END_OFFSET_MS / 1000:.0f}s, starting from 4s ({len(nature_trimmed) / 1000:.0f}s)")
+
     # Loop or trim the nature track to match the exact background duration
-    if len(nature) >= background_duration_ms:
-        background = nature[:background_duration_ms]
+    if len(nature_trimmed) >= background_duration_ms:
+        background = nature_trimmed[:background_duration_ms]
         print(f"  Trimmed nature track to {background_duration_s:.1f}s")
     else:
-        repeats = int(np.ceil(background_duration_ms / len(nature)))
-        background = nature * repeats
+        repeats = int(np.ceil(background_duration_ms / len(nature_trimmed)))
+        background = nature_trimmed * repeats
         background = background[:background_duration_ms]
         print(f"  Looped nature track {repeats}x to fill {background_duration_s:.1f}s")
-
-    # Apply fade in and fade out to avoid abrupt transitions
-    fade_ms = int(fade_duration * 1000)
-    if fade_ms > 0:
-        background = background.fade_in(fade_ms).fade_out(fade_ms)
-        print(f"  Applied {fade_duration}s fade in/out")
 
     # Reduce background volume relative to the original meditation
     if background_volume < 1.0:
@@ -340,6 +339,15 @@ def mix_nature_with_meditation(r2, bucket_name, meditation_key, nature_key, gong
         background = background.apply_gain(gain_db)
         print(f"  Background volume adjusted to {background_volume:.0%} "
               f"(gain: {gain_db:+.1f} dB)")
+
+    # Apply fade in/out directly to the background audio (not the full track
+    # with silence sections) so the fade affects the actual sound, not silence.
+    # This makes the background start very quiet and ramp up over the specified
+    # duration, and vice versa at the end.
+    fade_ms = int(fade_duration * 1000)
+    if fade_ms > 0 and len(background) > fade_ms * 2:
+        background = background.fade_in(fade_ms).fade_out(fade_ms)
+        print(f"  Applied {fade_duration}s fade in/out to background audio")
 
     # ── Position the background ─────────────────────────────────────────
     print("\n🔄 Mixing audio tracks...")
@@ -395,8 +403,8 @@ def main():
              'Defaults to 0.05 for binaural, 0.025 for nature.'
     )
     parser.add_argument(
-        '--fade-duration', type=float, default=3.0,
-        help='Fade in/out duration for the background in seconds (default: 3.0)'
+        '--fade-duration', type=float, default=4.0,
+        help='Fade in/out duration for the background in seconds (default: 4.0)'
     )
     parser.add_argument(
         '--target-subdirectory', type=str,
