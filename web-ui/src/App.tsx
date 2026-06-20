@@ -214,8 +214,8 @@ const css = `
   }
 
   .ring {
-    width: 96px;
-    height: 96px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     border: 1px solid rgba(160,148,240,0.3);
     display: flex;
@@ -230,7 +230,7 @@ const css = `
   .ring::before {
     content: '';
     position: absolute;
-    width: 76px; height: 76px;
+    width: 88px; height: 88px;
     border-radius: 50%;
     background: rgba(100,80,180,0.12);
     transition: background 0.3s;
@@ -315,12 +315,36 @@ const css = `
     letter-spacing: 0.04em;
   }
 
-  /* ── Bottom row ── */
+  /* ── Bottom row: play ring on left, volume sliders toward center-right ── */
   .bottom-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
+  }
+
+  /* ── Left side: play ring ── */
+  .bottom-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .ring-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* ── Right side: stacked volume sliders ── */
+  .vol-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    max-width: 160px;
+    margin-left: 12px;
+    margin-top: -8px;
   }
 
   .icon-btn {
@@ -350,7 +374,6 @@ const css = `
     display: flex;
     align-items: center;
     gap: 7px;
-    flex: 1;
   }
 
   .vol-wrap svg { width: 15px; height: 15px; color: rgba(192,189,232,0.28); flex-shrink: 0; }
@@ -372,6 +395,24 @@ const css = `
     border-radius: 50%;
     background: rgba(168,159,232,0.8);
     cursor: pointer;
+  }
+
+  /* ── Volume label for dual sliders ── */
+  .vol-label {
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(192,189,232,0.2);
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+  }
+
+  /* ── Download row below progress bar ── */
+  .download-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.75rem;
   }
 
   /* ── Variation hint ── */
@@ -713,6 +754,17 @@ interface MeditationLog {
   meditations: MeditationLogEntry[];
 }
 
+interface BackgroundLogEntry {
+  duration: string;
+  date_generated: string;
+  music: string;
+  source_file: string;
+}
+
+interface BackgroundLog {
+  backgrounds: BackgroundLogEntry[];
+}
+
 type AppScreen = 'player' | 'feedback' | 'thankyou';
 
 /* ─── Constants ─────────────────────────────────────────────────────── */
@@ -736,10 +788,36 @@ function parseDurationMinutes(duration: string): number {
 function buildR2Url(entry: MeditationLogEntry): string {
   const durationNum = parseDurationMinutes(entry.duration);
   if (entry.guided) {
-    return `${R2_BUCKET_URL}/meditations/${entry.music}/${durationNum}_${entry.level}_${entry.variation}.opus`;
+    // Voice track is always the pure voice from meditations/silence/
+    return `${R2_BUCKET_URL}/meditations/silence/${durationNum}_${entry.level}_${entry.variation}.opus`;
   } else {
     return `${R2_BUCKET_URL}/meditations/mute/${durationNum}_${entry.music}.opus`;
   }
+}
+
+/**
+ * Check if a background audio file exists for the given duration and music type,
+ * based on the backgrounds_log.json registry.
+ */
+function isBackgroundAvailable(
+  backgroundsLog: BackgroundLog | null,
+  duration: string,
+  music: string
+): boolean {
+  if (!backgroundsLog) return false;
+  const durationNum = parseDurationMinutes(duration);
+  return backgroundsLog.backgrounds.some(
+    b => parseDurationMinutes(b.duration) === durationNum && b.music === music
+  );
+}
+
+/**
+ * Build the URL for the background audio track.
+ * Files are stored in sounds/backgrounds/ and named like 5_nature.opus
+ */
+function buildBackgroundUrl(entry: MeditationLogEntry): string {
+  const durationNum = parseDurationMinutes(entry.duration);
+  return `${R2_BUCKET_URL}/sounds/backgrounds/${durationNum}_${entry.music}.opus`;
 }
 
 function formatDuration(duration: string): string {
@@ -768,6 +846,7 @@ function musicDisplayName(key: string): string {
   const labels: Record<string, string> = {
     nature: 'Naturaleza',
     silence: 'Silencio',
+    binaural: 'Binaural',
   };
   return labels[key] ?? capitalize(key);
 }
@@ -807,6 +886,13 @@ const IconVolume = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
     <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+  </svg>
+);
+
+const IconLeaf = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10Z" />
+    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
   </svg>
 );
 
@@ -948,11 +1034,13 @@ function ThankyouScreen({ visible, onNewSession }: ThankyouScreenProps) {
 /* ─── App ───────────────────────────────────────────────────────────── */
 export default function App() {
   const [repoLog, setRepoLog] = useState<MeditationLog | null>(null);
+  const [backgroundsLog, setBackgroundsLog] = useState<BackgroundLog | null>(null);
   const [duracion, setDuracion] = useState<string>('');
   const [nivel, setNivel] = useState<string>('');
   const [musica, setMusica] = useState<string>('');
   const [tipo, setTipo] = useState<boolean | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [backgroundAudioUrl, setBackgroundAudioUrl] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<MeditationLogEntry | null>(null);
   const [loadingOptions, setLoadingOptions] = useState<boolean>(true);
 
@@ -960,6 +1048,7 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.75);
+  const [backgroundVolume, setBackgroundVolume] = useState(0.75); // very subtle background level
 
   // Screen state: 'player' | 'feedback' | 'thankyou'
   const [screen, setScreen] = useState<AppScreen>('player');
@@ -967,17 +1056,22 @@ export default function App() {
   const [completedEntry, setCompletedEntry] = useState<MeditationLogEntry | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const backgroundAudioRef = useRef<HTMLAudioElement>(null);
   const tickRef = useRef<number | null>(null);
 
   /* init PostHog */
   useEffect(() => { initPostHog(); }, []);
 
-  /* fetch log */
+  /* fetch logs */
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/meditations_repo_log.json');
-        if (res.ok) setRepoLog(await res.json());
+        const [medRes, bgRes] = await Promise.all([
+          fetch('/meditations_repo_log.json'),
+          fetch('/backgrounds_log.json'),
+        ]);
+        if (medRes.ok) setRepoLog(await medRes.json());
+        if (bgRes.ok) setBackgroundsLog(await bgRes.json());
       } catch (e) {
         console.error(e);
       } finally {
@@ -986,12 +1080,17 @@ export default function App() {
     })();
   }, []);
 
-  /* sync volume */
+  /* sync voice volume */
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
 
-  /* tick timer */
+  /* sync background volume */
+  useEffect(() => {
+    if (backgroundAudioRef.current) backgroundAudioRef.current.volume = backgroundVolume;
+  }, [backgroundVolume]);
+
+  /* tick timer — driven by the main voice audio element */
   useEffect(() => {
     if (playing) {
       tickRef.current = window.setInterval(() => {
@@ -1023,23 +1122,33 @@ export default function App() {
   const getUniqueMusicOptions = () =>
     Array.from(new Set(allEntries.map(e => e.music))).sort();
 
+  /** Normalize guided: missing guided field + non-null level → guided=true */
+  const getGuidedNormalized = (e: MeditationLogEntry): boolean =>
+    e.guided === undefined ? e.level !== null : e.guided;
+
   const getUniqueGuidedOptions = (): boolean[] =>
-    Array.from(new Set(allEntries.map(e => e.guided))).sort((a, b) => a === b ? 0 : a ? -1 : 1);
+    Array.from(new Set(allEntries.map(e => getGuidedNormalized(e)))).sort((a, b) => a === b ? 0 : a ? -1 : 1);
 
   const getMatchingEntries = (): MeditationLogEntry[] => {
     if (!duracion || !musica || tipo === null) return [];
     if (tipo === true && !nivel) return [];
     if (tipo === true) {
       return allEntries.filter(
-        e => e.duration === duracion && e.level === nivel && e.music === musica && e.guided === true
+        e => e.duration === duracion && e.level === nivel && e.music === musica && getGuidedNormalized(e) === true
       );
     }
     return allEntries.filter(
-      e => e.duration === duracion && e.level === null && e.music === musica && e.guided === false
+      e => e.duration === duracion && e.level === null && e.music === musica && getGuidedNormalized(e) === false
     );
   };
 
-  const isAvailable = () => getMatchingEntries().length > 0;
+  const isAvailable = (): boolean => {
+    const matches = getMatchingEntries();
+    if (matches.length === 0) return false;
+    // For guided sessions, also require a matching background file
+    if (tipo === true && !isBackgroundAvailable(backgroundsLog, duracion, musica)) return false;
+    return true;
+  };
   const allSelected = tipo === null
     ? false
     : tipo === true
@@ -1052,9 +1161,11 @@ export default function App() {
 
     const entry = matches[Math.floor(Math.random() * matches.length)];
     const url = buildR2Url(entry);
+    const bgUrl = buildBackgroundUrl(entry);
 
     setSelectedEntry(entry);
     setAudioUrl(url);
+    setBackgroundAudioUrl(bgUrl);
     setCurrentTime(0);
     setPlaying(false);
     setScreen('player'); // make sure we're on the player
@@ -1069,8 +1180,18 @@ export default function App() {
 
     setTimeout(() => {
       const a = audioRef.current;
+      const bg = backgroundAudioRef.current;
       if (!a) return;
+
+      // Load voice audio
       a.load();
+
+      // Load and start background audio
+      if (bg && bgUrl) {
+        bg.load();
+        bg.play().catch(console.error);
+      }
+
       a.play().then(() => setPlaying(true)).catch(console.error);
       setDuration(0);
     }, 50);
@@ -1080,9 +1201,11 @@ export default function App() {
 
   const togglePlayPause = () => {
     const a = audioRef.current;
+    const bg = backgroundAudioRef.current;
     if (!a || !audioUrl) return;
     if (playing) {
       a.pause();
+      if (bg) bg.pause();
       setPlaying(false);
       captureEvent('meditation_paused', selectedEntry ? {
         duration: selectedEntry.duration,
@@ -1094,17 +1217,35 @@ export default function App() {
       } : undefined);
     } else {
       a.play().then(() => setPlaying(true)).catch(console.error);
+      if (bg) bg.play().catch(console.error);
     }
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     const a = audioRef.current;
+    const bg = backgroundAudioRef.current;
     if (!a || !duration) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    a.currentTime = pct * duration;
-    setCurrentTime(Math.floor(pct * duration));
+    const newTime = pct * duration;
+    a.currentTime = newTime;
+    if (bg) bg.currentTime = newTime;
+    setCurrentTime(Math.floor(newTime));
   };
+
+  /* When the background finishes loading metadata, sync its position to follow the voice */
+  useEffect(() => {
+    const bg = backgroundAudioRef.current;
+    const a = audioRef.current;
+    if (!bg || !a) return;
+
+    const onBgLoaded = () => {
+      bg.currentTime = a.currentTime;
+    };
+
+    bg.addEventListener('loadedmetadata', onBgLoaded);
+    return () => bg.removeEventListener('loadedmetadata', onBgLoaded);
+  }, [backgroundAudioUrl]);
 
   /* Session ended → begin gong crossfade into feedback */
   const handleSessionEnd = () => {
@@ -1127,6 +1268,7 @@ export default function App() {
   const handleNewSession = () => {
     setScreen('player');
     setAudioUrl(null);
+    setBackgroundAudioUrl(null);
     setSelectedEntry(null);
     setCompletedEntry(null);
     setPlaying(false);
@@ -1136,6 +1278,7 @@ export default function App() {
   const progressPct = duration > 0 ? Math.round((currentTime / duration) * 100) : 0;
   const variantCount = getMatchingEntries().length;
   const selectionComplete = allSelected && isAvailable();
+  const isGuided = tipo === true;
 
   return (
     <>
@@ -1173,7 +1316,7 @@ export default function App() {
                       <div
                         key={g ? 'guided' : 'unguided'}
                         className={`pill${tipo === g ? ' active' : ''}`}
-                        onClick={() => { setTipo(g); setNivel(''); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                        onClick={() => { setTipo(g); setNivel(''); setAudioUrl(null); setBackgroundAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
                       >
                         {g ? 'Guiada' : 'En silencio'}
                       </div>
@@ -1188,7 +1331,7 @@ export default function App() {
                       <div
                         key={d}
                         className={`pill${duracion === d ? ' active' : ''}`}
-                        onClick={() => { setDuracion(d); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                        onClick={() => { setDuracion(d); setAudioUrl(null); setBackgroundAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
                       >
                         {formatDuration(d)}
                       </div>
@@ -1204,7 +1347,7 @@ export default function App() {
                       <div
                         key={l}
                         className={`pill${nivel === l ? ' active' : ''}`}
-                        onClick={() => { setNivel(l); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                        onClick={() => { setNivel(l); setAudioUrl(null); setBackgroundAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
                       >
                         {capitalize(l ?? '')}
                       </div>
@@ -1220,7 +1363,7 @@ export default function App() {
                       <div
                         key={m}
                         className={`pill${musica === m ? ' active' : ''}`}
-                        onClick={() => { setMusica(m); setAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                        onClick={() => { setMusica(m); setAudioUrl(null); setBackgroundAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
                       >
                         {musicDisplayName(m)}
                       </div>
@@ -1236,28 +1379,58 @@ export default function App() {
 
             <div className="divider" />
 
-            {/* Breathing ring */}
-            <div className="ring-wrap">
-              <div
-                className={`ring${playing ? ' playing' : ''}`}
-                onClick={audioUrl ? togglePlayPause : (selectionComplete ? handlePlay : undefined)}
-                role="button"
-                aria-label={playing ? 'Pausar meditación' : 'Iniciar meditación'}
-                style={{ cursor: selectionComplete || audioUrl ? 'pointer' : 'default', opacity: selectionComplete || audioUrl ? 1 : 0.4 }}
-              >
-                <span className="ring-icon">
-                  {playing ? <IconPause /> : <IconPlay />}
-                </span>
+            {/* Bottom row: play ring on left, volume sliders stacked on right */}
+            <div className="bottom-row">
+              <div className="bottom-left">
+                <div
+                  className={`ring${playing ? ' playing' : ''}`}
+                  onClick={audioUrl ? togglePlayPause : (selectionComplete ? handlePlay : undefined)}
+                  role="button"
+                  aria-label={playing ? 'Pausar meditación' : 'Iniciar meditación'}
+                  style={{ cursor: selectionComplete || audioUrl ? 'pointer' : 'default', opacity: selectionComplete || audioUrl ? 1 : 0.4 }}
+                >
+                  <span className="ring-icon">
+                    {playing ? <IconPause /> : <IconPlay />}
+                  </span>
+                </div>
               </div>
 
-              <p className={`session-label${selectedEntry ? ' active' : ''}`}>
-                {selectedEntry
-                  ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level ?? '')} · ${musicDisplayName(selectedEntry.music)} · var. ${selectedEntry.variation ?? '-'}`
-                  : allSelected && !isAvailable()
-                    ? ''
-                    : 'elige tu sesión y presiona para comenzar'}
-              </p>
+              <div className="vol-stack">
+                <div className="vol-wrap">
+                  <IconVolume />
+                  <input
+                    type="range"
+                    className="vol-slider"
+                    min={0} max={1} step={0.01}
+                    value={volume}
+                    onChange={e => setVolume(parseFloat(e.target.value))}
+                    aria-label="Volumen"
+                  />
+                </div>
+
+                {isGuided && selectedEntry && (
+                  <div className="vol-wrap">
+                    <IconLeaf />
+                    <input
+                      type="range"
+                      className="vol-slider"
+                      min={0} max={1} step={0.01}
+                      value={backgroundVolume}
+                      onChange={e => setBackgroundVolume(parseFloat(e.target.value))}
+                      aria-label="Volumen de fondo"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
+
+            <p className={`session-label${selectedEntry ? ' active' : ''}`}>
+              {selectedEntry
+                ? `${formatDuration(selectedEntry.duration)} · ${capitalize(selectedEntry.level ?? '')} · ${musicDisplayName(selectedEntry.music)} · var. ${selectedEntry.variation ?? '-'}`
+                : allSelected && !isAvailable()
+                  ? ''
+                  : 'elige tu sesión y presiona para comenzar'}
+            </p>
 
             {/* Progress */}
             <div className="progress-area">
@@ -1270,24 +1443,8 @@ export default function App() {
               </div>
             </div>
 
-            {/* Bottom controls */}
-            <div className="bottom-row">
-              <button className="icon-btn" onClick={handleShuffle} disabled={!selectionComplete} aria-label="Otra variación aleatoria" title="Otra variación">
-                <IconShuffle />
-              </button>
-
-              <div className="vol-wrap">
-                <IconVolume />
-                <input
-                  type="range"
-                  className="vol-slider"
-                  min={0} max={1} step={0.01}
-                  value={volume}
-                  onChange={e => setVolume(parseFloat(e.target.value))}
-                  aria-label="Volumen"
-                />
-              </div>
-
+            {/* Download button below progress bar */}
+            <div className="download-row">
               <a
                 className="icon-btn"
                 href={audioUrl ?? '#'}
@@ -1306,12 +1463,6 @@ export default function App() {
               </a>
             </div>
 
-            {selectionComplete && (
-              <p className="var-hint">
-                {variantCount} variación{variantCount !== 1 ? 'es' : ''} disponible{variantCount !== 1 ? 's' : ''}
-                {variantCount > 1 && <> · <button onClick={handleShuffle}>cambiar variación</button></>}
-              </p>
-            )}
           </div>
         </div>
 
@@ -1330,13 +1481,21 @@ export default function App() {
         />
       </div>
 
-      {/* Hidden audio element */}
+      {/* Hidden voice audio element */}
       {audioUrl && (
         <audio
           ref={audioRef}
           src={audioUrl}
           onLoadedMetadata={() => { if (audioRef.current) setDuration(audioRef.current.duration); }}
           onEnded={handleSessionEnd}
+        />
+      )}
+
+      {/* Hidden background audio element — plays simultaneously with voice for guided sessions */}
+      {isGuided && backgroundAudioUrl && (
+        <audio
+          ref={backgroundAudioRef}
+          src={backgroundAudioUrl}
         />
       )}
     </>
