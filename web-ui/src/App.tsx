@@ -865,15 +865,6 @@ const IconPause = () => (
   </svg>
 );
 
-const IconShuffle = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="16 3 21 3 21 8" />
-    <line x1="4" y1="20" x2="21" y2="3" />
-    <polyline points="21 16 21 21 16 21" />
-    <line x1="15" y1="15" x2="21" y2="21" />
-  </svg>
-);
-
 const IconDownload = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -1197,8 +1188,6 @@ export default function App() {
     }, 50);
   };
 
-  const handleShuffle = () => { handlePlay(); };
-
   const togglePlayPause = () => {
     const a = audioRef.current;
     const bg = backgroundAudioRef.current;
@@ -1276,7 +1265,6 @@ export default function App() {
   };
 
   const progressPct = duration > 0 ? Math.round((currentTime / duration) * 100) : 0;
-  const variantCount = getMatchingEntries().length;
   const selectionComplete = allSelected && isAvailable();
   const isGuided = tipo === true;
 
