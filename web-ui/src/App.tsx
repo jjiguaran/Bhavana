@@ -1353,7 +1353,25 @@ export default function App() {
                       <div
                         key={m}
                         className={`pill${musica === m ? ' active' : ''}`}
-                        onClick={() => { setMusica(m); setAudioUrl(null); setBackgroundAudioUrl(null); setSelectedEntry(null); setPlaying(false); setCurrentTime(0); }}
+                        onClick={() => { 
+                          setMusica(m); 
+                          
+                          // Set dynamic initial volume based on the selection
+                          if (m === 'nature') {
+                            setBackgroundVolume(0.15);
+                          } else if (m === 'binaural') {
+                            setBackgroundVolume(0.75);
+                          } else {
+                            setBackgroundVolume(0.50); // Default fallback for silence or others
+                          }
+
+                          // Keep your existing resets
+                          setAudioUrl(null); 
+                          setBackgroundAudioUrl(null); 
+                          setSelectedEntry(null); 
+                          setPlaying(false); 
+                          setCurrentTime(0); 
+                        }}
                       >
                         {musicDisplayName(m)}
                       </div>
