@@ -49,6 +49,7 @@ const css = `
   /* ── Layout ── */
   .shell {
     min-height: 100vh;
+    min-height: 100dvh; /* accounts for Android status bar in standalone PWA */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -56,6 +57,31 @@ const css = `
     padding: 2rem 1.25rem 3rem;
     position: relative;
     z-index: 1;
+  }
+
+  /* ── PWA standalone: stretch card edge-to-edge, remove card chrome ── */
+  @media (display-mode: standalone) {
+    .shell {
+      padding: env(safe-area-inset-top, 1.25rem) 0 env(safe-area-inset-bottom, 2rem);
+      justify-content: flex-start;
+    }
+
+    .card {
+      max-width: 100%;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      padding: 2rem 1.5rem 2rem;
+      background: rgba(28, 24, 48, 0.55);
+    }
+
+    .feedback-card {
+      max-width: 100%;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      padding: 2.8rem 1.5rem 2.4rem;
+    }
   }
 
   /* ── Ambient orbs ── */
@@ -467,6 +493,13 @@ const css = `
     transition: opacity 1.1s var(--ease-breath);
     pointer-events: none;
     opacity: 0;
+  }
+
+  @media (display-mode: standalone) {
+    .feedback-wrap {
+      padding: env(safe-area-inset-top, 1.25rem) 0 env(safe-area-inset-bottom, 2rem);
+      justify-content: flex-start;
+    }
   }
 
   .feedback-wrap.visible {
