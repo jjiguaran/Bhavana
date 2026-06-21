@@ -1418,7 +1418,7 @@ export default function App() {
             {/* Download app link — shown when not in standalone mode */}
             <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
               <a
-                href="/install.html"
+                href="/install"
                 style={{
                   fontSize: '11px',
                   color: 'rgba(160,148,240,0.45)',
