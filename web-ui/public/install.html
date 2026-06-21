@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#100e1a" />
+  <meta name="description" content="Instala Bhavana — Meditación guiada en tu dispositivo" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/logo192.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <title>Bhavana — Instalar</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #100e1a; color: #c0bde8; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem 1.25rem; position: relative; }
+    .orb { position: fixed; border-radius: 50%; pointer-events: none; filter: blur(90px); opacity: 0.5; z-index: 0; }
+    .orb-1 { width: 55vw; height: 55vw; max-width: 700px; max-height: 700px; background: #4a3aaa; top: -15vw; right: -10vw; }
+    .orb-2 { width: 45vw; height: 45vw; max-width: 580px; max-height: 580px; background: #1a6e58; bottom: -10vw; left: -10vw; }
+    .orb-3 { width: 30vw; height: 30vw; max-width: 380px; max-height: 380px; background: #8a3060; top: 50%; right: 6%; }
+    .card { position: relative; z-index: 1; width: 100%; max-width: 420px; background: rgba(28, 24, 48, 0.72); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 0.5px solid rgba(160,148,240,0.18); border-radius: 24px; padding: 3rem 2rem; text-align: center; }
+    .logo { width: 80px; height: 80px; margin: 0 auto 1.5rem; display: block; border-radius: 20px; }
+    h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 34px; font-weight: 300; letter-spacing: 0.02em; color: rgba(235,232,255,0.92); margin-bottom: 0.3rem; }
+    .tagline { font-size: 12px; letter-spacing: 0.06em; color: rgba(192,189,232,0.38); margin-bottom: 2rem; }
+    .desc { font-size: 14px; line-height: 1.6; color: rgba(192,189,232,0.6); margin-bottom: 2rem; }
+    .install-btn {
+      width: 100%; padding: 14px 0; border-radius: 30px;
+      border: 0.5px solid rgba(123,111,208,0.5);
+      background: rgba(123,111,208,0.2);
+      color: rgba(220,215,255,0.95); font-size: 14px; font-family: 'DM Sans', system-ui, sans-serif;
+      letter-spacing: 0.08em; cursor: pointer; text-transform: uppercase; font-weight: 500;
+      transition: all 0.2s ease-out;
+    }
+    .install-btn:hover { background: rgba(123,111,208,0.35); border-color: rgba(123,111,208,0.7); }
+    .install-btn:active { transform: scale(0.98); }
+    .install-btn.hidden { display: none; }
+    .status { font-size: 12px; color: rgba(192,189,232,0.3); margin-top: 1rem; letter-spacing: 0.04em; }
+    .visit-link { display: block; margin-top: 1.5rem; font-size: 11px; color: rgba(192,189,232,0.2); text-decoration: none; letter-spacing: 0.04em; transition: color 0.18s; }
+    .visit-link:hover { color: rgba(192,189,232,0.5); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(123,111,208,0.2); border-top-color: rgba(123,111,208,0.7); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .success { display: none; margin-top: 1.5rem; padding: 12px; border-radius: 14px; background: rgba(77,184,150,0.1); border: 0.5px solid rgba(77,184,150,0.2); font-size: 13px; color: rgba(77,184,150,0.85); }
+    .success.show { display: block; }
+    .already { display: none; font-size: 13px; color: rgba(77,184,150,0.8); letter-spacing: 0.04em; margin-top: 1rem; }
+    .already.show { display: block; }
+    .loading-text { font-size: 12px; color: rgba(192,189,232,0.3); margin-top: 1rem; letter-spacing: 0.04em; }
+    .loading-text.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="card">
+    <img class="logo" src="/logo192.png" alt="Bhavana" />
+    <h1>Bhavana</h1>
+    <p class="tagline">meditación guiada</p>
+    <p class="desc" id="descText">Preparando la instalación…</p>
+    <button class="install-btn hidden" id="installBtn">📲 Instalar Bhavana</button>
+    <p class="already show" id="alreadyInstalled">✓ Bhavana ya está instalada</p>
+    <div class="success" id="successMsg">✓ Bhavana se ha instalado correctamente.<br/>Puedes cerrar esta página.</div>
+    <p class="loading-text" id="loadingText"><span class="spinner"></span>Verificando compatibilidad…</p>
+    <p class="status" id="statusMsg"></p>
+    <a class="visit-link" href="/">Comenzar a meditar →</a>
+  </div>
+  <script>
+    (function() {
+      var installBtn = document.getElementById('installBtn');
+      var statusMsg = document.getElementById('statusMsg');
+      var alreadyInstalled = document.getElementById('alreadyInstalled');
+      var successMsg = document.getElementById('successMsg');
+      var loadingText = document.getElementById('loadingText');
+      var descText = document.getElementById('descText');
+      var deferredPrompt = null;
+      var installAttempted = false;
+
+      // If already in standalone mode (app already installed)
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        alreadyInstalled.classList.add('show');
+        loadingText.classList.add('hidden');
+        descText.textContent = 'Bhavana ya está instalada en este dispositivo.';
+        return;
+      }
+
+      // Listen for beforeinstallprompt
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // Hide loading, show install button
+        loadingText.classList.add('hidden');
+        installBtn.classList.remove('hidden');
+        descText.textContent = 'Toca el botón para instalar Bhavana en tu dispositivo.';
+
+        // Auto-trigger: immediately prompt the user since they arrived via navigation (user gesture)
+        tryAutoInstall();
+      });
+
+      function tryAutoInstall() {
+        if (!deferredPrompt || installAttempted) return;
+        installAttempted = true;
+
+        installBtn.disabled = true;
+        installBtn.textContent = 'Instalando…';
+        installBtn.classList.remove('hidden');
+        descText.textContent = 'Instalando Bhavana…';
+
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(result) {
+          deferredPrompt = null;
+          if (result.outcome === 'accepted') {
+            successMsg.classList.add('show');
+            installBtn.classList.add('hidden');
+            descText.innerHTML = '¡Bhavana se ha instalado! 🎉';
+          } else {
+            descText.textContent = 'Toca el botón para instalar Bhavana en tu dispositivo.';
+            installBtn.disabled = false;
+            installBtn.innerHTML = '📲 Instalar Bhavana';
+          }
+        });
+      }
+
+      // If beforeinstallprompt doesn't fire within 3 seconds, it likely won't
+      setTimeout(function() {
+        if (!deferredPrompt && !installAttempted) {
+          loadingText.classList.add('hidden');
+          descText.innerHTML = 'Para instalar Bhavana en tu dispositivo:<br/><br/>' +
+            'En Chrome: menú ⋮ → "Instalar app" o "Agregar a pantalla de inicio"<br/><br/>' +
+            'O visita la app primero, interactúa un poco, y vuelve a esta página.';
+          installBtn.classList.remove('hidden');
+          installBtn.innerHTML = '📲 Intentar instalar';
+          installBtn.onclick = function() {
+            // Try prompting again
+            if (deferredPrompt) {
+              tryAutoInstall();
+            } else {
+              statusMsg.textContent = 'Aún no disponible. Visita la app, interactúa, y vuelve a esta página.';
+            }
+          };
+        }
+      }, 3000);
+
+      // Manual install button click (fallback)
+      installBtn.addEventListener('click', function() {
+        if (deferredPrompt) {
+          tryAutoInstall();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

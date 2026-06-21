@@ -1,5 +1,5 @@
 # Cloudflare Pages redirects/rewrites
-# Rewrite /descargar to serve the static install page (200 = internal rewrite, no redirect)
 
-/descargar /descargar/index.html 200
-/descargar/ /descargar/index.html 200
+# Redirect old /descargar paths to the new install page
+/descargar /install.html 301
+/descargar/ /install.html 301
