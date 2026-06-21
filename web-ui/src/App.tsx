@@ -737,6 +737,65 @@ const css = `
     background: rgba(123,111,208,0.24);
     border-color: rgba(123,111,208,0.65);
   }
+
+  /* ════════════════════════════════════════════════════════════════════
+     PWA INSTALL BANNER
+  ════════════════════════════════════════════════════════════════════ */
+  .install-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
+    background: rgba(123,111,208,0.12);
+    border: 0.5px solid rgba(123,111,208,0.3);
+    animation: glyph-in 0.6s var(--ease-breath) forwards;
+  }
+
+  .install-banner-text {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(200,190,255,0.8);
+    line-height: 1.4;
+  }
+
+  .install-banner-btn {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 0.5px solid rgba(123,111,208,0.5);
+    background: rgba(123,111,208,0.2);
+    color: rgba(220,215,255,0.95);
+    font-size: 11px;
+    font-family: var(--font-ui);
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.18s ease-out;
+    white-space: nowrap;
+  }
+
+  .install-banner-btn:hover {
+    background: rgba(123,111,208,0.35);
+    border-color: rgba(123,111,208,0.7);
+  }
+
+  .install-banner-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(192,189,232,0.25);
+    font-size: 16px;
+    padding: 2px 4px;
+    transition: color 0.18s;
+    line-height: 1;
+  }
+
+  .install-banner-close:hover {
+    color: rgba(192,189,232,0.6);
+  }
 `;
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
@@ -1041,6 +1100,10 @@ export default function App() {
   const [volume, setVolume] = useState(0.75);
   const [backgroundVolume, setBackgroundVolume] = useState(0.15); // very subtle background level
 
+  // PWA install prompt
+  const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+
   // Screen state: 'player' | 'feedback' | 'thankyou'
   const [screen, setScreen] = useState<AppScreen>('player');
   // The entry that just completed, kept for PostHog context in feedback
@@ -1052,6 +1115,27 @@ export default function App() {
 
   /* init PostHog */
   useEffect(() => { initPostHog(); }, []);
+
+  /* Capture the PWA install prompt event */
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault(); // Prevent Chrome from showing the auto-prompt
+      setInstallPrompt(e); // Store the event so we can trigger it later
+      setShowInstallBanner(true); // Show our custom install button
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = () => {
+    if (!installPrompt) return;
+    (installPrompt as any).prompt(); // Show the install dialog
+    (installPrompt as any).userChoice.then((result: { outcome: string }) => {
+      captureEvent('pwa_install', { outcome: result.outcome });
+      setShowInstallBanner(false);
+      setInstallPrompt(null);
+    });
+  };
 
   /* fetch logs */
   useEffect(() => {
@@ -1294,6 +1378,25 @@ export default function App() {
             <p className="tod">{getTimeOfDay()}</p>
             <h1 className="brand-title">Bhavana</h1>
             <p className="tagline">un momento solo para ti</p>
+
+            {/* PWA install banner */}
+            {showInstallBanner && (
+              <div className="install-banner">
+                <span className="install-banner-text">
+                  Instala Bhavana en tu dispositivo
+                </span>
+                <button className="install-banner-btn" onClick={handleInstallClick}>
+                  Instalar
+                </button>
+                <button
+                  className="install-banner-close"
+                  onClick={() => setShowInstallBanner(false)}
+                  aria-label="Cerrar"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
 
             {loadingOptions && <p className="loading-msg">cargando sesiones…</p>}
 
