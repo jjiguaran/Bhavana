@@ -1063,10 +1063,13 @@ interface ThankyouScreenProps {
   visible: boolean;
   onNewSession: () => void;
   installAvailable: boolean;
+  isIOS: boolean;
+  isInstalled: boolean;
   onInstall: () => void;
 }
 
-function ThankyouScreen({ visible, onNewSession, installAvailable, onInstall }: ThankyouScreenProps) {
+function ThankyouScreen({ visible, onNewSession, installAvailable, isIOS, isInstalled, onInstall }: ThankyouScreenProps) {
+  const showInstallCta = !isInstalled && (installAvailable || isIOS);
   return (
     <div className={`feedback-wrap${visible ? ' visible' : ''}`}>
       <div className="feedback-card">
@@ -1075,37 +1078,51 @@ function ThankyouScreen({ visible, onNewSession, installAvailable, onInstall }: 
           <h2 className="thankyou-title">Gracias</h2>
           <p className="thankyou-sub">Tu experiencia nos ayuda a mejorar.</p>
 
-          {/* Post-session install prompt — shown when the app is installable */}
-          {installAvailable && (
-            <button
-              className="install-thanks-btn"
-              onClick={onInstall}
-              style={{
-                width: '100%',
-                padding: '11px 0',
-                borderRadius: '30px',
-                border: '0.5px solid rgba(123,111,208,0.45)',
-                background: 'rgba(123,111,208,0.14)',
-                color: 'rgba(200,190,255,0.9)',
-                fontSize: '12px',
-                fontFamily: 'var(--font-ui)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease-out',
+          {/* Post-session install prompt */}
+          {showInstallCta && (
+            isIOS ? (
+              <p style={{
+                fontSize: '11px',
+                color: 'rgba(160,148,240,0.55)',
+                letterSpacing: '0.04em',
+                textAlign: 'center',
+                lineHeight: 1.6,
                 marginTop: '0.5rem',
-              }}
-              onMouseOver={e => {
-                e.currentTarget.style.background = 'rgba(123,111,208,0.26)';
-                e.currentTarget.style.borderColor = 'rgba(123,111,208,0.7)';
-              }}
-              onMouseOut={e => {
-                e.currentTarget.style.background = 'rgba(123,111,208,0.14)';
-                e.currentTarget.style.borderColor = 'rgba(123,111,208,0.45)';
-              }}
-            >
-              📲 Instalar Bhavana
-            </button>
+                marginBottom: '0.25rem',
+              }}>
+                📲 Instala la app: toca <strong>Compartir</strong> → <strong>Agregar a pantalla de inicio</strong>
+              </p>
+            ) : (
+              <button
+                className="install-thanks-btn"
+                onClick={onInstall}
+                style={{
+                  width: '100%',
+                  padding: '11px 0',
+                  borderRadius: '30px',
+                  border: '0.5px solid rgba(123,111,208,0.45)',
+                  background: 'rgba(123,111,208,0.14)',
+                  color: 'rgba(200,190,255,0.9)',
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-ui)',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-out',
+                  marginTop: '0.5rem',
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.background = 'rgba(123,111,208,0.26)';
+                  e.currentTarget.style.borderColor = 'rgba(123,111,208,0.7)';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.background = 'rgba(123,111,208,0.14)';
+                  e.currentTarget.style.borderColor = 'rgba(123,111,208,0.45)';
+                }}
+              >
+                📲 Instalar Bhavana
+              </button>
+            )
           )}
 
           <button className="new-session-btn" onClick={onNewSession}>
@@ -1139,6 +1156,10 @@ export default function App() {
   // PWA install prompt
   const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+  // Detect iOS (no beforeinstallprompt support) and standalone mode
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
 
   // Screen state: 'player' | 'feedback' | 'thankyou'
   const [screen, setScreen] = useState<AppScreen>('player');
@@ -1415,42 +1436,78 @@ export default function App() {
             <h1 className="brand-title">Bhavana</h1>
             <p className="tagline">un momento solo para ti</p>
 
-            {/* Download app link — shown when not in standalone mode */}
-            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-              <a
-                href="/install"
-                style={{
-                  fontSize: '11px',
-                  color: 'rgba(160,148,240,0.45)',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '3px',
-                  letterSpacing: '0.04em',
-                  transition: 'color 0.18s',
-                }}
-                onMouseOver={e => (e.currentTarget.style.color = 'rgba(168,159,232,0.85)')}
-                onMouseOut={e => (e.currentTarget.style.color = 'rgba(160,148,240,0.45)')}
-              >
-                Instalar app
-              </a>
-            </div>
+            {/* PWA install — three cases: already installed, Chrome/Android prompt, iOS manual */}
+            {!isInstalled && (
+              <>
+                {/* Chrome / Android: show banner when beforeinstallprompt has fired */}
+                {showInstallBanner && (
+                  <div className="install-banner">
+                    <span className="install-banner-text">
+                      Instala Bhavana en tu dispositivo
+                    </span>
+                    <button className="install-banner-btn" onClick={handleInstallClick}>
+                      Instalar
+                    </button>
+                    <button
+                      className="install-banner-close"
+                      onClick={() => setShowInstallBanner(false)}
+                      aria-label="Cerrar"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
 
-            {/* PWA install banner */}
-            {showInstallBanner && (
-              <div className="install-banner">
-                <span className="install-banner-text">
-                  Instala Bhavana en tu dispositivo
-                </span>
-                <button className="install-banner-btn" onClick={handleInstallClick}>
-                  Instalar
-                </button>
-                <button
-                  className="install-banner-close"
-                  onClick={() => setShowInstallBanner(false)}
-                  aria-label="Cerrar"
-                >
-                  ✕
-                </button>
-              </div>
+                {/* Chrome / Android: subtle text link as fallback when banner was dismissed
+                    or hasn't appeared yet but the prompt is available */}
+                {!showInstallBanner && installPrompt && (
+                  <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+                    <button
+                      onClick={handleInstallClick}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '11px',
+                        color: 'rgba(160,148,240,0.45)',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: '3px',
+                        letterSpacing: '0.04em',
+                        fontFamily: 'var(--font-ui)',
+                        padding: 0,
+                        transition: 'color 0.18s',
+                      }}
+                      onMouseOver={e => (e.currentTarget.style.color = 'rgba(168,159,232,0.85)')}
+                      onMouseOut={e => (e.currentTarget.style.color = 'rgba(160,148,240,0.45)')}
+                    >
+                      Instalar app
+                    </button>
+                  </div>
+                )}
+
+                {/* iOS Safari: no beforeinstallprompt — show manual instructions */}
+                {isIOS && !installPrompt && (
+                  <div className="install-banner ios-install-banner" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+                    <span className="install-banner-text" style={{ fontWeight: 400 }}>
+                      Para instalar en iPhone o iPad:
+                    </span>
+                    <span className="install-banner-text" style={{ opacity: 0.7 }}>
+                      Toca <strong>Compartir</strong> (□↑) → <strong>Agregar a pantalla de inicio</strong>
+                    </span>
+                    <button
+                      className="install-banner-close"
+                      aria-label="Cerrar"
+                      style={{ alignSelf: 'flex-end', marginTop: '-28px' }}
+                      onClick={() => {
+                        const el = document.querySelector('.ios-install-banner') as HTMLElement | null;
+                        if (el) el.style.display = 'none';
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </>
             )}
 
             {loadingOptions && <p className="loading-msg">cargando sesiones…</p>}
@@ -1645,6 +1702,8 @@ export default function App() {
           visible={screen === 'thankyou'}
           onNewSession={handleNewSession}
           installAvailable={installPrompt !== null}
+          isIOS={isIOS}
+          isInstalled={isInstalled}
           onInstall={handleInstallClick}
         />
       </div>
