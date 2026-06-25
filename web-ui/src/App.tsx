@@ -1290,11 +1290,6 @@ export default function App() {
         const a = audioRef.current;
         if (!a) return;
         setCurrentTime(Math.floor(a.currentTime));
-
-        if (a.duration && isFinite(a.duration) && a.duration !== duration) {
-          setDuration(a.duration);
-        }
-
         if (a.ended) {
           setPlaying(false);
           setCurrentTime(0);
@@ -1305,7 +1300,7 @@ export default function App() {
       if (tickRef.current) clearInterval(tickRef.current);
     }
     return () => { if (tickRef.current) clearInterval(tickRef.current); };
-  }, [playing, duration]);
+  }, [playing]);
 
   const allEntries = repoLog?.meditations ?? [];
 
@@ -1365,6 +1360,7 @@ export default function App() {
     setAudioUrl(url);
     setBackgroundAudioUrl(bgUrl);
     setCurrentTime(0);
+    setDuration(parseDurationMinutes(entry.duration) * 60); // set from known metadata — iOS .opus duration reports wrong values
     setPlaying(false);
     setScreen('player'); // make sure we're on the player
 
@@ -1393,7 +1389,6 @@ export default function App() {
       }
 
       a.play().then(() => setPlaying(true)).catch(console.error);
-      setDuration(0);
     }, 50);
   };
 
@@ -1779,13 +1774,6 @@ export default function App() {
         <audio
           ref={audioRef}
           src={audioUrl}
-          onLoadedMetadata={() => {
-            const a = audioRef.current;
-            if (!a) return;
-            if (a.duration && isFinite(a.duration)) {
-              setDuration(a.duration);
-            }
-          }}
           onEnded={handleSessionEnd}
         />
       )}
