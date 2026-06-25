@@ -946,6 +946,33 @@ const IconLeaf = () => (
   </svg>
 );
 
+const IconInstagram = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" />
+    <circle cx="12" cy="12" r="5" />
+    <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const IconTikTok = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
+
+const IconFacebook = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+const IconYouTube = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="5" width="20" height="14" rx="4" />
+    <polygon points="10 9 15 12 10 15 10 9" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 /* ─── Feedback Screen ───────────────────────────────────────────────── */
 interface FeedbackScreenProps {
   visible: boolean;
@@ -1053,6 +1080,41 @@ function FeedbackScreen({ visible, completedEntry, onDone, onNewSession }: Feedb
         <button className="feedback-skip" onClick={onNewSession}>
           Omitir · nueva sesión
         </button>
+
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '24px',
+          marginTop: '1.5rem',
+        }}>
+          {[
+            { href: 'https://www.instagram.com/bhavanaapp/', Icon: IconInstagram, label: 'Instagram' },
+            { href: 'https://www.tiktok.com/@bhavanaapp',   Icon: IconTikTok,    label: 'TikTok' },
+            { href: 'https://www.facebook.com/profile.php?id=61590964273861',  Icon: IconFacebook,  label: 'Facebook' },
+            { href: 'https://www.youtube.com/@Bhavanaapp',   Icon: IconYouTube,   label: 'YouTube' },
+          ].map(({ href, Icon, label }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              style={{
+                color: 'rgba(192,189,232,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'color 0.2s ease',
+                width: '25px',
+                height: '25px',
+              }}
+              onMouseOver={e => { e.currentTarget.style.color = 'rgba(192,189,232,0.5)'; }}
+              onMouseOut={e => { e.currentTarget.style.color = 'rgba(192,189,232,0.2)'; }}
+            >
+              <Icon />
+            </a>
+          ))}
+        </div>
+        
       </div>
     </div>
   );
@@ -1222,13 +1284,17 @@ export default function App() {
     if (backgroundAudioRef.current) backgroundAudioRef.current.volume = backgroundVolume;
   }, [backgroundVolume]);
 
-  /* tick timer — driven by the main voice audio element */
   useEffect(() => {
     if (playing) {
       tickRef.current = window.setInterval(() => {
         const a = audioRef.current;
         if (!a) return;
         setCurrentTime(Math.floor(a.currentTime));
+
+        if (a.duration && isFinite(a.duration) && a.duration !== duration) {
+          setDuration(a.duration);
+        }
+
         if (a.ended) {
           setPlaying(false);
           setCurrentTime(0);
@@ -1239,7 +1305,7 @@ export default function App() {
       if (tickRef.current) clearInterval(tickRef.current);
     }
     return () => { if (tickRef.current) clearInterval(tickRef.current); };
-  }, [playing]);
+  }, [playing, duration]);
 
   const allEntries = repoLog?.meditations ?? [];
 
@@ -1713,7 +1779,13 @@ export default function App() {
         <audio
           ref={audioRef}
           src={audioUrl}
-          onLoadedMetadata={() => { if (audioRef.current) setDuration(audioRef.current.duration); }}
+          onLoadedMetadata={() => {
+            const a = audioRef.current;
+            if (!a) return;
+            if (a.duration && isFinite(a.duration)) {
+              setDuration(a.duration);
+            }
+          }}
           onEnded={handleSessionEnd}
         />
       )}
